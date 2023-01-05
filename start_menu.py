@@ -11,15 +11,14 @@ engine.set_sound(sound.SOUND_TYPE_OPEN_MENU, 'data/music/button.wav')
 
 
 def check_player(name):
-    nik = name.values()
-    print(list(nik)[0])
+    print(list(name.values()))
     return True
 
 
 def start_game():
-    print(menu.get_input_data())
     if check_player(menu.get_input_data()):
         mixer.music.stop()
+
     else:
         menu.reset_value()
 
@@ -42,8 +41,8 @@ my_theme = Theme(background_color=(0, 0, 0, 0), title_background_color=(4, 47, 1
 my_theme.background_color = background
 menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
 menu.add.label('Login or Sign up', font_size=20)
-menu.add.text_input('Name:', default='', font_size=20)
-menu.add.text_input('Password:', default='', font_size=20)
+menu.add.text_input('Name:', default='Your name', font_size=20)
+menu.add.text_input('Password:', default='Your password', font_size=20)
 menu.add.button('Play', start_game, font_size=40)
 menu.add.button('Quit', pygame_menu.events.EXIT, font_size=30)
 menu.center_content()
