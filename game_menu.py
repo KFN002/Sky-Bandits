@@ -1,6 +1,6 @@
 import pygame
 import pygame_menu
-from pygame_menu import Theme
+from pygame_menu import Theme, sound
 from pygame import mixer
 import sqlite3
 
@@ -49,7 +49,8 @@ def start():
     menu.add.button('Play War', game(2), align=pygame_menu.locals.ALIGN_LEFT)
     menu.add.button('Play Defend', game(3), align=pygame_menu.locals.ALIGN_LEFT)
     menu.add.button('Play onslaught', game(4), align=pygame_menu.locals.ALIGN_LEFT)
+    menu.add.button('Quit', pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_RIGHT)
+    engine = sound.Sound(-1)
+    engine.set_sound(pygame_menu.sound.SOUND_TYPE_CLICK_MOUSE, 'data/music/button.wav')
+    menu.set_sound(engine, recursive=True)
     menu.mainloop(surface, fps_limit=60, bgfun=draw_background)
-
-
-start()
