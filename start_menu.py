@@ -13,6 +13,8 @@ def start_game():
         mixer.music.stop()
         menu.close()
         game_menu.start(data)
+    else:
+        menu.reset_value()
 
 
 pygame.init()
@@ -33,8 +35,8 @@ menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
 devs_pic = menu.add.image('data/game_dev_logo.jpg', load_from_file=True,
                           align=pygame_menu.locals.ALIGN_RIGHT)
 menu.add.label('Login or Sign up', font_size=20)
-menu.add.text_input('', default='Your name', font_size=20)
-menu.add.text_input('', default='Your password', font_size=20)
+menu.add.text_input('Name:', font_size=20)
+menu.add.text_input('Password:', font_size=20)
 menu.add.button('Play', start_game, font_size=40)
 menu.add.button('Quit', pygame_menu.events.EXIT, font_size=30)
 menu.center_content()

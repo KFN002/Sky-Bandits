@@ -6,8 +6,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 name = 'Sky Bandits: players'
 sheet = client.create(name)
 sheet.share('fedotovkirill4000@gmail.com', perm_type='user', role='writer')
-'''
-'''
 sheet.row_values(3)
 sheet.col_values(2)
 sheet.cell(2, 2).value()
@@ -37,8 +35,18 @@ def check_player(name, password):
     return [name, password, 100, 0, planes]
 
 
-'''
-print(check_player('KFN001', 'KFN001'))
-print(check_player('Mike', 'Longust777'))
-print(check_player('John', 'Helldoor001'))
-'''
+def change_value(price, data):
+    print('Buying')
+    scope = ['https://www.googleapis.com/auth/spreadsheets',
+             "https://www.googleapis.com/auth/drive"]
+    credentials = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    client = gspread.authorize(credentials)
+    sheet_check = client.open('Sky Bandits: players').sheet1
+    data = sheet_check.get_all_values()
+    players = list(map(lambda x: x[:2], data))
+    print(players)
+    print(data[:2])
+    '''
+    row = players.index(data[:2])
+    print(row)
+    '''
