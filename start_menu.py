@@ -3,20 +3,16 @@ from pygame_menu import sound, Theme
 import pygame
 from pygame import mixer
 import game_menu
-
-
-def check_player(name):
-    print(list(name.values()))
-    return True
+from data_master import check_player
 
 
 def start_game():
-    if check_player(menu.get_input_data()):
+    player_info = list(menu.get_input_data().values())
+    if len(player_info[0]) >= 4 and len(player_info[1]) >= 4:
+        data = check_player(*player_info)
         mixer.music.stop()
         menu.close()
-        game_menu.start()
-    else:
-        menu.reset_value()
+        game_menu.start(data)
 
 
 pygame.init()
@@ -34,6 +30,8 @@ my_theme = Theme(background_color=(0, 0, 0, 0), title_background_color=(4, 47, 1
                  widget_font_color=pygame.Color('white'))
 my_theme.background_color = background
 menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
+devs_pic = menu.add.image('data/game_dev_logo.jpg', load_from_file=True,
+                          align=pygame_menu.locals.ALIGN_RIGHT)
 menu.add.label('Login or Sign up', font_size=20)
 menu.add.text_input('', default='Your name', font_size=20)
 menu.add.text_input('', default='Your password', font_size=20)
