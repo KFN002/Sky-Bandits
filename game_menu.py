@@ -2,19 +2,23 @@ import pygame
 import pygame_menu
 import sqlite3
 import game
-from data_master import change_value
+import data_master
 from pygame_menu import Theme, sound
 from pygame import mixer
 
 
-def draw_background(plane, buy_btn, pic, planes_available, all_planes):
+def compare_data(plane, planes_available, all_planes):
     planes_available = list(str(planes_available))
     all_planes = list(map(lambda x: x[0], all_planes))
+    return planes_available[all_planes.index(plane[0][0])]
+
+
+def draw_background(plane, buy_btn, pic, planes_available, all_planes):
     con = sqlite3.connect('planes.db')
     cur = con.cursor()
     result = cur.execute(f"""SELECT hist_pic, hist_text, price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
     pic.set_image(pygame_menu.baseimage.BaseImage(result[0]))
-    if planes_available[all_planes.index(plane[0][0])] == '1':
+    if compare_data(plane, planes_available, all_planes) == '1':
         buy_btn.set_title('Choose')
     else:
         buy_btn.set_title('Buy')
@@ -30,14 +34,12 @@ def start_game(plane_status, plane, player_data):
 
 
 def buy_plane(plane, player_data, planes_available, all_planes):
-    planes_available = list(str(planes_available))
-    all_planes = list(map(lambda x: x[0], all_planes))
     con = sqlite3.connect('planes.db')
     cur = con.cursor()
     result = cur.execute(f"""SELECT price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
     con.close()
-    if planes_available[all_planes.index(plane[0][0])] == '0':
-        change_value(result[0], player_data)
+    if compare_data(plane, planes_available, all_planes) == '0':
+        data_master.change_value(result[0], player_data, plane)
 
 
 def start(player_data):
@@ -66,9 +68,6 @@ def start(player_data):
     menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
     menu.add.label(f'Money {money}', align=pygame_menu.locals.ALIGN_RIGHT, font_size=24)
     current_plane = menu.add.selector('Select Plane', planes, align=pygame_menu.locals.ALIGN_RIGHT, font_size=30)
-    '''
-    plane_info = menu.add.label('plane info', align=pygame_menu.locals.ALIGN_RIGHT, font_size=8)
-    '''
     pic_place = menu.add.image('data/real_pics/mig-21bis.jpg', load_from_file=True,
                                align=pygame_menu.locals.ALIGN_RIGHT)
     buy_button = menu.add.button('choose', buy_plane(current_plane.get_value(), player_data, player_data[4], planes),

@@ -3,13 +3,13 @@ from pygame_menu import sound, Theme
 import pygame
 from pygame import mixer
 import game_menu
-from data_master import check_player
+import data_master
 
 
 def start_game():
     player_info = list(menu.get_input_data().values())
     if len(player_info[0]) >= 4 and len(player_info[1]) >= 4:
-        data = check_player(*player_info)
+        data = data_master.check_player(*player_info)
         mixer.music.stop()
         menu.close()
         game_menu.start(data)
