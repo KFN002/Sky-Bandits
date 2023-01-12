@@ -26,6 +26,9 @@ def check_player(name, password):
     players = list(map(lambda x: x[:2], data))
     if [name, password] in players:
         return data[players.index([name, password])]
+    names = list(map(lambda x: x[0], players))
+    if name in names and players[names.index(name)][1] != password:
+        return None
     con = sqlite3.connect('planes.db')
     cur = con.cursor()
     result = cur.execute("""SELECT model from planes""").fetchall()
@@ -50,9 +53,9 @@ def change_value(price, player_data, plane):
     cur = con.cursor()
     results = cur.execute(f"""SELECT model FROM planes ORDER BY price""").fetchall()
     con.close()
-    for elems in results:
-        all_planes.append(elems[0])
-    bought = all_planes.index(plane)
+    for elem in results:
+        all_planes.append(elem[0])
+    bought = all_planes.index(plane[0][0])
     new_planes = list(str(player_data[4]))
     new_planes[bought] = 1
     planes_own = ''.join(str(a) for a in new_planes)

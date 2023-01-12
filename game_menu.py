@@ -33,13 +33,15 @@ def start_game(plane_status, plane, player_data):
         game.play(list(plane_data), player_data)
 
 
-def buy_plane(plane, player_data, planes_available, all_planes):
+def buy_plane(plane, player_data, planes_available, all_planes, menu):
     con = sqlite3.connect('planes.db')
     cur = con.cursor()
     result = cur.execute(f"""SELECT price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
     con.close()
     if compare_data(plane, planes_available, all_planes) == '0':
         data_master.change_value(result[0], player_data, plane)
+        menu.close()
+        start(data_master.check_player(*player_data[:2]))
 
 
 def start(player_data):
@@ -67,11 +69,12 @@ def start(player_data):
     my_theme.background_color = background
     menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
     menu.add.label(f'Money {money}', align=pygame_menu.locals.ALIGN_RIGHT, font_size=24)
-    current_plane = menu.add.selector('Select Plane', planes, align=pygame_menu.locals.ALIGN_RIGHT, font_size=30)
+    current_plane = menu.add.selector('Select Plane', planes, align=pygame_menu.locals.ALIGN_RIGHT, font_size=24)
     pic_place = menu.add.image('data/real_pics/mig-21bis.jpg', load_from_file=True,
                                align=pygame_menu.locals.ALIGN_RIGHT)
-    buy_button = menu.add.button('choose', buy_plane(current_plane.get_value(), player_data, player_data[4], planes),
-                                 align=pygame_menu.locals.ALIGN_RIGHT, font_size=30)
+    buy_button = menu.add.button('choose', buy_plane(current_plane.get_value(),
+                                                     player_data, player_data[4], planes, menu),
+                                 align=pygame_menu.locals.ALIGN_RIGHT, font_size=26)
     menu.add.button('Play level', start_game(buy_button, current_plane.get_value(), player_data),
                     align=pygame_menu.locals.ALIGN_LEFT, font_size=30)
     menu.add.button('Quit', pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_RIGHT, font_size=18)
@@ -81,6 +84,8 @@ def start(player_data):
     while True:
         draw_background(current_plane.get_value(), buy_button, pic_place, player_data[4], planes)
         events = pygame.event.get()
+        if buy_button.is_selected():
+            buy_plane(current_plane.get_value(), player_data, player_data[4], planes, menu)
         for event in events:
             if event.type == pygame.QUIT:
                 exit()
