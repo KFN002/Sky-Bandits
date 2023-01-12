@@ -26,7 +26,7 @@ def start_menu():
     mixer.music.load('data/music/theme.mp3')
     mixer.music.set_volume(0.2)
     mixer.music.play(-1)
-    background = pygame_menu.baseimage.BaseImage('data/background.jpg')
+    background = pygame_menu.baseimage.BaseImage('data/backgrounds/background.jpg')
     sc_size = width, height = 1200, 600
     surface = pygame.display.set_mode(sc_size)
     my_theme = Theme(background_color=(0, 0, 0, 0), title_background_color=(4, 47, 126),

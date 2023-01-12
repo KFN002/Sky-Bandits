@@ -19,13 +19,13 @@ def draw_background(plane, buy_btn, pic, planes_available, all_planes):
     result = cur.execute(f"""SELECT hist_pic, hist_text, price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
     pic.set_image(pygame_menu.baseimage.BaseImage(result[0]))
     if compare_data(plane, planes_available, all_planes) == '1':
-        buy_btn.set_title('Choose')
+        buy_btn.set_title('')
     else:
         buy_btn.set_title('Buy')
 
 
 def start_game(plane_status, plane, player_data):
-    if plane_status.get_title() == 'choose':
+    if plane_status.get_title() == '':
         con = sqlite3.connect('planes.db')
         cur = con.cursor()
         plane_data = cur.execute(f"""SELECT * FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
@@ -58,7 +58,7 @@ def start(player_data):
     mixer.music.load('data/music/arcade_theme.mp3')
     mixer.music.set_volume(0.2)
     mixer.music.play(-1)
-    background = pygame_menu.baseimage.BaseImage('data/hangar.png')
+    background = pygame_menu.baseimage.BaseImage('data/backgrounds/hangar.png')
     sc_size = width, height = 1200, 650
     surface = pygame.display.set_mode(sc_size)
     my_theme = Theme(background_color=(0, 0, 0, 0), title_background_color=(4, 47, 126),
@@ -72,11 +72,10 @@ def start(player_data):
     current_plane = menu.add.selector('Select Plane', planes, align=pygame_menu.locals.ALIGN_RIGHT, font_size=24)
     pic_place = menu.add.image('data/real_pics/mig-21bis.jpg', load_from_file=True,
                                align=pygame_menu.locals.ALIGN_RIGHT)
-    buy_button = menu.add.button('choose', buy_plane(current_plane.get_value(),
+    buy_button = menu.add.button('', buy_plane(current_plane.get_value(),
                                                      player_data, player_data[4], planes, menu),
                                  align=pygame_menu.locals.ALIGN_RIGHT, font_size=26)
-    menu.add.button('Play level', start_game(buy_button, current_plane.get_value(), player_data),
-                    align=pygame_menu.locals.ALIGN_LEFT, font_size=30)
+    start_btn = menu.add.button('Play level', align=pygame_menu.locals.ALIGN_LEFT, font_size=30)
     menu.add.button('Quit', pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_RIGHT, font_size=18)
     engine = sound.Sound(-1)
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_CLICK_MOUSE, 'data/music/button.wav')
@@ -86,6 +85,8 @@ def start(player_data):
         events = pygame.event.get()
         if buy_button.is_selected():
             buy_plane(current_plane.get_value(), player_data, player_data[4], planes, menu)
+        if start_btn.is_selected():
+            start_game(buy_button, current_plane.get_value(), player_data)
         for event in events:
             if event.type == pygame.QUIT:
                 exit()

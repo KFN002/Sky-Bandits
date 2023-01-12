@@ -47,16 +47,17 @@ def change_value(price, player_data, plane):
     data = sheet.get_all_values()
     players = list(map(lambda x: x[:2], data))
     row = players.index(player_data[:2])
-    sheet.update_cell(row + 1, 3, int(sheet.cell(row + 1, 3).value) - int(price))
-    all_planes = []
-    con = sqlite3.connect('planes.db')
-    cur = con.cursor()
-    results = cur.execute(f"""SELECT model FROM planes ORDER BY price""").fetchall()
-    con.close()
-    for elem in results:
-        all_planes.append(elem[0])
-    bought = all_planes.index(plane[0][0])
-    new_planes = list(str(player_data[4]))
-    new_planes[bought] = 1
-    planes_own = ''.join(str(a) for a in new_planes)
-    sheet.update_cell(row + 1, 5, int(planes_own))
+    if int(sheet.cell(row + 1, 3).value) - int(price) >= 0:
+        sheet.update_cell(row + 1, 3, int(sheet.cell(row + 1, 3).value) - int(price))
+        all_planes = []
+        con = sqlite3.connect('planes.db')
+        cur = con.cursor()
+        results = cur.execute(f"""SELECT model FROM planes ORDER BY price""").fetchall()
+        con.close()
+        for elem in results:
+            all_planes.append(elem[0])
+        bought = all_planes.index(plane[0][0])
+        new_planes = list(str(player_data[4]))
+        new_planes[bought] = 1
+        planes_own = ''.join(str(a) for a in new_planes)
+        sheet.update_cell(row + 1, 5, int(planes_own))
