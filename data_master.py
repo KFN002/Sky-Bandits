@@ -73,7 +73,4 @@ def game_update(planes_added):
     client = gspread.authorize(credentials)
     sheet = client.open('Sky Bandits: players').sheet1
     for row in range(1, len(sheet.get_all_values())):
-        try:
-            sheet.update_cell(row + 1, 5, int(str(sheet.cell(row + 1, 5).value) + '0' * planes_added))
-        except:
-            print(sheet.cell(row + 1, 5).value)
+        sheet.update_cell(row + 1, 5, int(str(sheet.cell(row + 1, 5).value) + '0' * planes_added))

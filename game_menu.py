@@ -74,7 +74,7 @@ def start(player_data):
     pic_place = menu.add.image('data/real_pics/mig-21bis.jpg', load_from_file=True,
                                align=pygame_menu.locals.ALIGN_RIGHT)
     buy_button = menu.add.button('', buy_plane(current_plane.get_value(),
-                                                     player_data, player_data[4], planes, menu),
+                                               player_data, player_data[4], planes, menu),
                                  align=pygame_menu.locals.ALIGN_RIGHT, font_size=26)
     start_btn = menu.add.button('Play level', align=pygame_menu.locals.ALIGN_LEFT, font_size=30)
     menu.add.button('Quit', pygame_menu.events.EXIT, align=pygame_menu.locals.ALIGN_RIGHT, font_size=18)

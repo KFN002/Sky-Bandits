@@ -1,10 +1,8 @@
 import sqlite3
-
 import pygame_menu
 from pygame_menu import sound, Theme
 import pygame
 from pygame import mixer
-
 import data_master
 import game_menu
 from data_master import check_player
