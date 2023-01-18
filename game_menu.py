@@ -17,11 +17,12 @@ def draw_background(plane, buy_btn, pic, planes_available, all_planes):
     con = sqlite3.connect('planes.db')
     cur = con.cursor()
     result = cur.execute(f"""SELECT hist_pic, hist_text, price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
+    con.close()
     pic.set_image(pygame_menu.baseimage.BaseImage(result[0]))
     if compare_data(plane, planes_available, all_planes) == '1':
         buy_btn.set_title('')
     else:
-        buy_btn.set_title('Buy')
+        buy_btn.set_title(f'Buy {result[2]}')
 
 
 def start_game(plane_status, plane, player_data):

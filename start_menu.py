@@ -1,7 +1,11 @@
+import sqlite3
+
 import pygame_menu
 from pygame_menu import sound, Theme
 import pygame
 from pygame import mixer
+
+import data_master
 import game_menu
 from data_master import check_player
 
@@ -46,6 +50,7 @@ def start_menu():
     menu.center_content()
     menu.add.label('Game by KFN001', align=pygame_menu.locals.ALIGN_LEFT,
                    font_color=pygame.Color('grey'), font_size=8)
+    added_planes = menu.add.button('Update planes from DB', font_size=8, align=pygame_menu.locals.ALIGN_LEFT)
     engine = sound.Sound(-1)
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_CLICK_MOUSE, 'data/music/button.wav')
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_KEY_ADDITION, 'data/music/button.wav')
@@ -55,6 +60,15 @@ def start_menu():
         events = pygame.event.get()
         if play_btn.is_selected():
             start_game(menu)
+        if added_planes.is_selected():
+            con = sqlite3.connect('planes.db')
+            cur = con.cursor()
+            plane_quantity = cur.execute(f"""SELECT COUNT(*) FROM planes""").fetchone()
+            con.close()
+            if int(plane_quantity[0]) - 10 >= 1:
+                data_master.game_update(int(plane_quantity[0]) - 10)
+            else:
+                added_planes.hide()
         for event in events:
             if event.type == pygame.QUIT:
                 exit()

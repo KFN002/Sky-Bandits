@@ -32,7 +32,7 @@ def check_player(name, password):
         if len(list(data[players.index([name, password])][4])) >= len(result):
             return data[players.index([name, password])]
         else:
-            print('Invalid plane quantity, remake the sheet')
+            print('Invalid plane quantity, remake the player data manually')
     names = list(map(lambda x: x[0], players))
     if name in names and players[names.index(name)][1] != password:
         return None
@@ -64,3 +64,16 @@ def change_value(price, player_data, plane):
         new_planes[bought] = 1
         planes_own = ''.join(str(a) for a in new_planes)
         sheet.update_cell(row + 1, 5, int(planes_own))
+
+
+def game_update(planes_added):
+    scope = ['https://www.googleapis.com/auth/spreadsheets',
+             "https://www.googleapis.com/auth/drive"]
+    credentials = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
+    client = gspread.authorize(credentials)
+    sheet = client.open('Sky Bandits: players').sheet1
+    for row in range(1, len(sheet.get_all_values())):
+        try:
+            sheet.update_cell(row + 1, 5, int(str(sheet.cell(row + 1, 5).value) + '0' * planes_added))
+        except:
+            print(sheet.cell(row + 1, 5).value)
