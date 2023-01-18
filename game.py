@@ -46,6 +46,22 @@ class Player(pygame.sprite.Sprite):
             self.rect.left += self.speed
 
 
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, x, y, speed):
+        super().__init__(all_sprites)
+        self.pic = load_image('data/bullet.png')
+        self.speed = speed
+        self.rect.x = x
+        self.rect.y = y
+        self.hit = False
+
+    def update(self):
+        self.rect.y -= self.speed * 2
+
+    def hit(self):
+        pass
+
+
 class EnemyBase(pygame.sprite.Sprite):
     def __init__(self, speed):
         super().__init__(all_sprites)

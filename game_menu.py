@@ -5,6 +5,7 @@ import game
 import data_master
 from pygame_menu import Theme, sound
 from pygame import mixer
+from show_info import redirect
 
 
 def compare_data(plane, planes_available, all_planes):
@@ -73,6 +74,7 @@ def start(player_data):
     current_plane = menu.add.selector('Select Plane', planes, align=pygame_menu.locals.ALIGN_RIGHT, font_size=24)
     pic_place = menu.add.image('data/real_pics/mig-21bis.jpg', load_from_file=True,
                                align=pygame_menu.locals.ALIGN_RIGHT)
+    info_btn = menu.add.button('View plane info', align=pygame_menu.locals.ALIGN_RIGHT, font_size=16)
     buy_button = menu.add.button('', buy_plane(current_plane.get_value(),
                                                player_data, player_data[4], planes, menu),
                                  align=pygame_menu.locals.ALIGN_RIGHT, font_size=26)
@@ -84,11 +86,13 @@ def start(player_data):
     while True:
         draw_background(current_plane.get_value(), buy_button, pic_place, player_data[4], planes)
         events = pygame.event.get()
-        if buy_button.is_selected():
-            buy_plane(current_plane.get_value(), player_data, player_data[4], planes, menu)
-        if start_btn.is_selected():
-            start_game(buy_button, current_plane.get_value(), player_data)
         for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and buy_button._mouseover and event.button == 1:
+                buy_plane(current_plane.get_value(), player_data, player_data[4], planes, menu)
+            if event.type == pygame.MOUSEBUTTONDOWN and start_btn._mouseover and event.button == 1:
+                start_game(buy_button, current_plane.get_value(), player_data)
+            if event.type == pygame.MOUSEBUTTONDOWN and info_btn._mouseover and event.button == 1:
+                redirect(current_plane.get_value())
             if event.type == pygame.QUIT:
                 exit()
         if menu.is_enabled():

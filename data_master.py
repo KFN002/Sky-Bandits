@@ -29,10 +29,7 @@ def check_player(name, password):
     result = cur.execute("""SELECT model from planes""").fetchall()
     con.close()
     if [name, password] in players:
-        if len(list(data[players.index([name, password])][4])) >= len(result):
-            return data[players.index([name, password])]
-        else:
-            print('Invalid plane quantity, remake the player data manually')
+        return data[players.index([name, password])]
     names = list(map(lambda x: x[0], players))
     if name in names and players[names.index(name)][1] != password:
         return None
