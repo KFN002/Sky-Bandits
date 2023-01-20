@@ -32,6 +32,10 @@ def start_game(plane_status, plane, player_data):
         cur = con.cursor()
         plane_data = cur.execute(f"""SELECT * FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
         con.close()
+        mixer.stop()
+        mixer.music.load('data/music/mission.mp3')
+        mixer.music.set_volume(0.2)
+        mixer.music.play(-1)
         game.play(list(plane_data), player_data)
 
 
