@@ -1,11 +1,13 @@
 import pygame
 import pygame_menu
 import sqlite3
-import game
+import game1
+import game2
 import data_master
 from pygame_menu import Theme, sound
 from pygame import mixer
 from show_info import redirect
+from random import choice
 
 
 def compare_data(plane, planes_available, all_planes):
@@ -36,7 +38,10 @@ def start_game(plane_status, plane, player_data):
         mixer.music.load('data/music/mission.mp3')
         mixer.music.set_volume(0.2)
         mixer.music.play(-1)
-        game.play(list(plane_data), player_data)
+        if choice([True, False]):
+            game1.play(list(plane_data), player_data)
+        else:
+            game2.play(list(plane_data), player_data)
 
 
 def buy_plane(plane, player_data, planes_available, all_planes, menu):
