@@ -15,11 +15,11 @@ def test_connection(host='http://google.com'):
         pygame.display.set_caption('OFFLINE ERROR')
         font = pygame.font.Font('freesansbold.ttf', 32)
         text = font.render('No internet connection', True, (0, 0, 0))
-        textRect = text.get_rect()
-        textRect.center = (width // 2, height // 2)
+        textrect = text.get_rect()
+        textrect.center = (width // 2, height // 2)
         while True:
             screen.fill('white')
-            screen.blit(text, textRect)
+            screen.blit(text, textrect)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
