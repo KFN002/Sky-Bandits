@@ -1,22 +1,23 @@
 import pygame
 from pygame import mixer
-from data_master import change_score_money
+import data_master
 from random import choice
+import game_menu
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, plane_data):
         pygame.sprite.Sprite.__init__(self)
-        self.frames = [pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
+        self.frames = [pygame.image.load(plane_data[5]),
+                       pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
                        pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
                        pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
-        self.frames.append(pygame.image.load(plane_data[5]))
-        self.current_frame = len(self.frames) - 1
-        self.image = self.frames[self.current_frame]
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
         self.speed = plane_data[3]
         self.bullets = pygame.sprite.Group()
-        self.bombs = 10
+        self.bombs = int(plane_data[13])
         self.hits = int(plane_data[8])
         self.down = False
         self.rect.x = 600
@@ -46,11 +47,14 @@ class Player(pygame.sprite.Sprite):
         else:
             self.rect.x += self.speed
 
-    def change_down_stage(self):
-        pass
+    def update(self, group):
+        if self.down and self.cur_frame < len(self.frames) - 1:
+            self.cur_frame += 1
+            self.image = self.frames[self.cur_frame]
+        elif self.down:
+            group.remove(self)
 
     def shoot(self):
-        print('shooting')
         bullet = Bullet(pygame.image.load('data/bullet.png'), self.rect.x, self.rect.y, self.speed)
         self.bullets.add(bullet)
 
@@ -60,13 +64,13 @@ class Player(pygame.sprite.Sprite):
             bombs.add(bmb)
             self.bombs -= 1
 
-    def death(self, player_data, score):
-        change_score_money(player_data, score)
-
-    def hit(self, player_data, score):
+    def hit(self, plane_data, player_data, score):
         self.hits -= 1
         if self.hits <= 0:
-            self.death(player_data, score)
+            self.down = True
+            mixer.stop()
+            data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
+            data_master.show_info(player_data)
 
     def add_bombs(self):
         self.bombs += 1
@@ -92,22 +96,39 @@ class Bullet(pygame.sprite.Sprite):
 class Bomb(pygame.sprite.Sprite):
     def __init__(self, x, y, speed):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('data/arms/bomb.png')
+        self.frames = [pygame.image.load('data/arms/bomb.png'),
+                       pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
+                       pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
+                       pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
         self.speed = speed * 0.5
         self.rect = self.image.get_rect()
         self.rect.x = x + 60
         self.rect.y = y + 70
+        self.size_x = 20
+        self.size_y = 36
         self.hit = False
         self.sound = mixer.Sound('data/music/bomb.wav')
+        self.explosion = mixer.Sound('data/music/explosion.wav')
+        self.explosion.set_volume(0.5)
         self.sound.set_volume(0.5)
         self.sound.play(1)
 
-    def update(self):
-        self.rect.y += self.speed
-        '''
-        self.image = pygame.transform.scale(self.image, (30,
-                                                         30))
-        '''
+    def update(self, group):
+        if not self.hit and self.size_x >= 12:
+            self.rect.y += self.speed
+            self.size_x *= 0.99
+            self.size_y *= 0.99
+            self.image = pygame.transform.smoothscale(self.image, (self.size_x, self.size_y))
+        elif not self.hit:
+            self.hit = True
+            self.explosion.play()
+        elif self.hit and self.cur_frame < len(self.frames) - 1:
+            self.cur_frame += 1
+            self.image = self.frames[self.cur_frame]
+        else:
+            group.remove(self)
 
 
 class EnemyBase(pygame.sprite.Sprite):

@@ -56,7 +56,7 @@ def play(plane_data, player_data):
             rocket.aa_move()
             rocket.update_animation(enemy_aa)
             if rocket.check_collision(players):
-                player.hit(player_data, score)
+                player.hit(plane_data, player_data, score)
         for enemy in enemies:
             enemy.move()
             if enemy.bombed(bombs):
@@ -64,7 +64,9 @@ def play(plane_data, player_data):
                 player.add_bombs()
             enemy.update_animation(enemies)
         for bmb in bombs:
-            bmb.update()
+            bmb.update(bombs)
+        for gamer in players:
+            gamer.update(players)
         score_text = font.render(f'Score: {score}', True, (255, 255, 255))
         bomb_text = font.render(f'Bombs: {player.bombs}', True, (255, 255, 255))
         health_text = font.render(f'Health: {player.hits}', True, (255, 255, 255))

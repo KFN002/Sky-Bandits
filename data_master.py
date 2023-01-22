@@ -1,7 +1,7 @@
 import gspread
 import sqlite3
 from oauth2client.service_account import ServiceAccountCredentials
-
+import game_menu
 '''
 name = 'Sky Bandits: players'
 sheet = client.create(name)
@@ -16,12 +16,17 @@ print(sheet.get_all_values())
 '''
 
 
-def check_player(name, password):
+def connect():
     scope = ['https://www.googleapis.com/auth/spreadsheets',
              "https://www.googleapis.com/auth/drive"]
     credentials = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
     client = gspread.authorize(credentials)
-    sheet_check = client.open('Sky Bandits: players').sheet1
+    sheet = client.open('Sky Bandits: players').sheet1
+    return sheet
+
+
+def check_player(name, password):
+    sheet_check = connect()
     data = sheet_check.get_all_values()
     players = list(map(lambda x: x[:2], data))
     con = sqlite3.connect('planes.db')
@@ -39,11 +44,7 @@ def check_player(name, password):
 
 
 def change_value(price, player_data, plane):
-    scope = ['https://www.googleapis.com/auth/spreadsheets',
-             "https://www.googleapis.com/auth/drive"]
-    credentials = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
-    client = gspread.authorize(credentials)
-    sheet = client.open('Sky Bandits: players').sheet1
+    sheet = connect()
     data = sheet.get_all_values()
     players = list(map(lambda x: x[:2], data))
     row = players.index(player_data[:2])
@@ -64,14 +65,15 @@ def change_value(price, player_data, plane):
 
 
 def game_update(planes_added):
-    scope = ['https://www.googleapis.com/auth/spreadsheets',
-             "https://www.googleapis.com/auth/drive"]
-    credentials = ServiceAccountCredentials.from_json_keyfile_name("credentials.json", scope)
-    client = gspread.authorize(credentials)
-    sheet = client.open('Sky Bandits: players').sheet1
+    sheet = connect()
     for row in range(1, len(sheet.get_all_values())):
         sheet.update_cell(row + 1, 5, int(str(sheet.cell(row + 1, 5).value) + '0' * planes_added))
 
 
 def change_score_money(player_data, score):
-    pass
+    sheet = connect()
+
+
+def show_info(player_data):
+    sheet = connect()
+    game_menu.start(player_data)
