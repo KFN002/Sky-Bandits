@@ -42,7 +42,7 @@ def start_menu():
                      widget_font_color=pygame.Color('white'))
     my_theme.background_color = background
     menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
-    menu.add.image('data/game_dev_logo.jpg', load_from_file=True,
+    menu.add.image('data/logos/game_dev_logo.jpg', load_from_file=True,
                    align=pygame_menu.locals.ALIGN_RIGHT)
     menu.add.label('Login or Sign up', font_size=20)
     menu.add.text_input('Name:', font_size=20)
