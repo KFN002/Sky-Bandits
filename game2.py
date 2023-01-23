@@ -1,114 +1,66 @@
+from game_objects import Player, Enemy
 from images import load_image
 import pygame
 from pygame import mixer
 import random
 
 
-pygame.init()
-size = width, height = 1400, 600
-screen = pygame.display.set_mode(size)
-all_sprites = pygame.sprite.Group()
-background = pygame.image.load('data/backgrounds/game_background.png').convert()
-
-
-class Player(pygame.sprite.Sprite):
-    def __init__(self, plane_data):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(plane_data[5])
-        self.rect = self.image.get_rect()
-        self.speed = plane_data[3]
-        self.bullets = pygame.sprite.Group()
-        self.hits = 0
-        self.rect.topleft = [600, 300]
-
-    def Up(self):
-        if self.rect.top <= 0:
-            self.rect.top = 0
-        else:
-            self.rect.top -= self.speed
-
-    def Down(self):
-        if self.rect.top >= 600 - self.rect.height:
-            self.rect.top = 600 - self.rect.height
-        else:
-            self.rect.top += self.speed
-
-    def Left(self):
-        if self.rect.left <= 0:
-            self.rect.left = 0
-        else:
-            self.rect.left -= self.speed
-
-    def Right(self):
-        if self.rect.left >= 1200 - self.rect.width:
-            self.rect.left = 1200 - self.rect.width
-        else:
-            self.rect.left += self.speed
-
-
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, speed):
-        super().__init__(all_sprites)
-        self.pic = load_image('data/bullet.png')
-        self.speed = speed
-        self.rect.x = x
-        self.rect.y = y
-        self.hit = False
-
-    def update(self):
-        self.rect.y -= self.speed * 2
-
-    def hit(self):
-        pass
-
-
-class Enemy(pygame.sprite.Sprite):
-    def __init__(self, enemy_pic, downed_pics, default_pos, player_speed):
-        pygame.sprite.Sprite.__init__(self)
-        self.pic = enemy_pic
-        self.rect = self.image.get_rect()
-        self.rect.x = default_pos[0]
-        self.rect.y = 0
-        self.down_imgs = downed_pics
-        self.speed = player_speed
-        self.downed = False
-        self.animation_stage = 0
-
-    def move(self):
-        if not self.downed:
-            self.rect.y += self.speed
-
-
 def play(plane_data, player_data):
-    print(plane_data)
-    print(player_data)
-    player = Player(plane_data)
+    k_spawn = 0
     running = True
+    play_death_animation = False
+    score = 0
+    pygame.init()
+    size = width, height = 1000, 600
+    screen = pygame.display.set_mode(size)
+    font = pygame.font.Font('freesansbold.ttf', 20)
+    background = random.choice(['data/backgrounds/jungles.png',
+                                'data/backgrounds/forest.png',
+                                'data/backgrounds/mountains.png'])
+    background = pygame.image.load(background).convert()
+    enemies = pygame.sprite.Group()
+    players = pygame.sprite.Group()
+    enemies_killed = pygame.sprite.Group()
+    player = Player(plane_data)
+    players.add(player)
     screen.fill('white')
     fps = 60
-    '''
-    e_base = EnemyBase(player.speed)
-    '''
     clock = pygame.time.Clock()
     while running:
         key_pressed = pygame.key.get_pressed()
         if key_pressed[pygame.K_w] or key_pressed[pygame.K_UP]:
-            player.Up()
+            player.move_up()
         if key_pressed[pygame.K_s] or key_pressed[pygame.K_DOWN]:
-            player.Down()
+            player.move_down()
         if key_pressed[pygame.K_a] or key_pressed[pygame.K_LEFT]:
-            player.Left()
+            player.move_left()
         if key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]:
-            player.Right()
+            player.move_right()
+        if pygame.mouse.get_pressed()[0]:
+            player.shoot()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        enemy_pos = [random.randint(0, width - 150), 0]
+        enemy_base = Enemy(plane_data[3], enemy_pos)
+        if enemy_base.check_collision(enemies) and k_spawn == 50:
+            enemies.add(enemy_base)
+        for enemy in enemies:
+            enemy.move()
+            if enemy.check_collision_with_player(players):
+                player.death(player_data, score)
+                play_death_animation = True
+                print('collision')
+        if play_death_animation:
+            player.update()
+        score_text = font.render(f'Score: {score}', True, (255, 255, 255))
+        score_rect = score_text.get_rect()
+        score_rect.center = (900, 50)
         screen.blit(background, (0, 0))
-        '''
-        screen.blit(boom.image, (200, 300))
-        boom.update()
-        '''
-        screen.blit(player.image, player.rect)
+        enemies.draw(screen)
+        players.draw(screen)
+        screen.blit(score_text, score_rect)
         clock.tick(fps)
+        k_spawn = (k_spawn + 1) % 51
         pygame.display.flip()
     pygame.quit()

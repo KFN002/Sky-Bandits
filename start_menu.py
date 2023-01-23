@@ -6,22 +6,18 @@ from pygame import mixer
 import data_master
 import game_menu
 from data_master import check_player
-from offline import test_connection
 
 
 def start_game(menu):
     player_info = list(menu.get_input_data().values())
     if len(player_info[0]) >= 4 and len(player_info[1]) >= 4:
-        if test_connection():
-            data = check_player(*player_info)
-            if data is None:
-                menu.reset_value()
-            else:
-                mixer.music.stop()
-                menu.close()
-                game_menu.start(data)
+        data = check_player(*player_info)
+        if data is None:
+            menu.reset_value()
         else:
-            exit()
+            mixer.music.stop()
+            menu.close()
+            game_menu.start(data)
     else:
         menu.reset_value()
 
@@ -42,7 +38,7 @@ def start_menu():
                      widget_font_color=pygame.Color('white'))
     my_theme.background_color = background
     menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
-    menu.add.image('data/game_dev_logo.jpg', load_from_file=True,
+    menu.add.image('data/logos/game_dev_logo.jpg', load_from_file=True,
                    align=pygame_menu.locals.ALIGN_RIGHT)
     menu.add.label('Login or Sign up', font_size=20)
     menu.add.text_input('Name:', font_size=20)
