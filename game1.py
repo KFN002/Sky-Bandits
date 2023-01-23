@@ -1,4 +1,4 @@
-from game_objects import Player, EnemyBase, AARocket
+from game_objects import Player, EnemyBase, AARocket, Decorations
 import pygame
 import random
 
@@ -7,7 +7,7 @@ def play(plane_data, player_data):
     pygame.init()
     k_spawn = 0
     k_spawn_aa = 0
-    k_autolevelling = 1
+    k_spawn_decs = 1
     score = 0
     size = width, height = 1000, 600
     screen = pygame.display.set_mode(size)
@@ -18,7 +18,7 @@ def play(plane_data, player_data):
     font = pygame.font.Font('freesansbold.ttf', 20)
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
-    enemies_killed = pygame.sprite.Group()
+    decorations = pygame.sprite.Group()
     bombs = pygame.sprite.Group()
     player = Player(plane_data)
     players.add(player)
@@ -46,8 +46,12 @@ def play(plane_data, player_data):
                 running = False
         base_pos = [random.randint(0, width - 150), 0]
         enemy_base = EnemyBase(plane_data[3], base_pos)
-        if enemy_base.check_collision(enemies) and k_spawn == 50:
+        if enemy_base.check_collision(enemies) and k_spawn == 50 and enemy_base.check_collision(decorations):
             enemies.add(enemy_base)
+        dec_pos = [random.randint(0, width - 150), 0]
+        decor = Decorations(plane_data[3], *dec_pos)
+        if decor.check_collision(decorations) and k_spawn_decs == 30 and decor.check_collision(enemies):
+            decorations.add(decor)
         if k_spawn_aa == 150:
             aa = AARocket(plane_data[12], player.rect.x, height)
             enemy_aa.add(aa)
@@ -56,7 +60,10 @@ def play(plane_data, player_data):
             rocket.aa_move()
             rocket.update_animation(enemy_aa)
             if rocket.check_collision(players):
-                player.hit(plane_data, player_data, score)
+                player.hit()
+        for dec in decorations:
+            dec.move()
+            dec.update(bombs)
         for enemy in enemies:
             enemy.move()
             if enemy.bombed(bombs):
@@ -67,6 +74,7 @@ def play(plane_data, player_data):
             bmb.update(bombs)
         for gamer in players:
             gamer.update(players)
+            gamer.check_animation_status(plane_data, player_data, score, players)
         score_text = font.render(f'Score: {score}', True, (255, 255, 255))
         bomb_text = font.render(f'Bombs: {player.bombs}', True, (255, 255, 255))
         health_text = font.render(f'Health: {player.hits}', True, (255, 255, 255))
@@ -77,6 +85,7 @@ def play(plane_data, player_data):
         bomb_rect.center = (900, 80)
         score_rect.center = (900, 50)
         screen.blit(background, (0, 0))
+        decorations.draw(screen)
         enemies.draw(screen)
         enemy_aa.draw(screen)
         players.draw(screen)
@@ -87,6 +96,6 @@ def play(plane_data, player_data):
         clock.tick(fps)
         k_spawn_aa = (k_spawn_aa + 1) % 151
         k_spawn = (k_spawn + 1) % 51
-        k_autolevelling += 1
+        k_spawn_decs = (k_spawn_decs + 1) % 31
         pygame.display.flip()
     pygame.quit()

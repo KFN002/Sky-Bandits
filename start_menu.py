@@ -6,22 +6,18 @@ from pygame import mixer
 import data_master
 import game_menu
 from data_master import check_player
-from offline import test_connection
 
 
 def start_game(menu):
     player_info = list(menu.get_input_data().values())
     if len(player_info[0]) >= 4 and len(player_info[1]) >= 4:
-        if test_connection():
-            data = check_player(*player_info)
-            if data is None:
-                menu.reset_value()
-            else:
-                mixer.music.stop()
-                menu.close()
-                game_menu.start(data)
+        data = check_player(*player_info)
+        if data is None:
+            menu.reset_value()
         else:
-            exit()
+            mixer.music.stop()
+            menu.close()
+            game_menu.start(data)
     else:
         menu.reset_value()
 

@@ -2,7 +2,6 @@ import pygame
 from pygame import mixer
 import data_master
 from random import choice
-import game_menu
 
 
 class Player(pygame.sprite.Sprite):
@@ -20,6 +19,7 @@ class Player(pygame.sprite.Sprite):
         self.bombs = int(plane_data[13])
         self.hits = int(plane_data[8])
         self.down = False
+        self.exploding = False
         self.rect.x = 600
         self.rect.y = 300
 
@@ -48,10 +48,11 @@ class Player(pygame.sprite.Sprite):
             self.rect.x += self.speed
 
     def update(self, group):
-        if self.down and self.cur_frame < len(self.frames) - 1:
+        if self.down and self.cur_frame < len(self.frames) - 1 and self.exploding:
             self.cur_frame += 1
             self.image = self.frames[self.cur_frame]
         elif self.down:
+            self.exploding = False
             group.remove(self)
 
     def shoot(self):
@@ -64,16 +65,21 @@ class Player(pygame.sprite.Sprite):
             bombs.add(bmb)
             self.bombs -= 1
 
-    def hit(self, plane_data, player_data, score):
+    def hit(self):
         self.hits -= 1
         if self.hits <= 0:
             self.down = True
+            self.exploding = True
             mixer.stop()
-            data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
-            data_master.show_info(player_data)
 
     def add_bombs(self):
         self.bombs += 1
+
+    def check_animation_status(self, plane_data, player_data, score, group):
+        if self.down and not self.exploding:
+            group.remove(self)
+            mixer.stop()
+            data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -116,7 +122,7 @@ class Bomb(pygame.sprite.Sprite):
         self.sound.play(1)
 
     def update(self, group):
-        if not self.hit and self.size_x >= 12:
+        if not self.hit and self.size_x >= 10:
             self.rect.y += self.speed
             self.size_x *= 0.99
             self.size_y *= 0.99
@@ -166,10 +172,11 @@ class EnemyBase(pygame.sprite.Sprite):
 
     def bombed(self, bmbs):
         if pygame.sprite.spritecollideany(self, bmbs):
-            pygame.sprite.spritecollideany(self, bmbs).sound.stop()
-            bmbs.remove(pygame.sprite.spritecollideany(self, bmbs))
-            self.destroyed = True
-            return True
+            if pygame.sprite.spritecollideany(self, bmbs).size_x <= 10:
+                pygame.sprite.spritecollideany(self, bmbs).sound.stop()
+                bmbs.remove(pygame.sprite.spritecollideany(self, bmbs))
+                self.destroyed = True
+                return True
         return False
 
 
@@ -186,7 +193,7 @@ class AARocket(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = height
-        self.speed = 4
+        self.speed = 5
         self.destroyed = False
 
     def chase(self):
@@ -248,3 +255,36 @@ class Enemy(pygame.sprite.Sprite):
         if pygame.sprite.spritecollideany(self, player):
             return True
         return False
+
+
+class Decorations(pygame.sprite.Sprite):
+    def __init__(self, speed, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.building = choice(['building1', 'building2', 'building3', 'building4', 'building5', 'building6',
+                               'building7'])
+        self.frames = [pygame.image.load(f'data/backgrounds/{self.building}/image1.png'),
+                       pygame.image.load(f'data/backgrounds/{self.building}/image4.png')]
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.speed = int(speed * 0.5)
+
+    def move(self):
+        self.rect.y += self.speed
+
+    def check_collision(self, objects):
+        if not pygame.sprite.spritecollideany(self, objects):
+            return True
+        return False
+
+    def update(self, bmbs):
+        if pygame.sprite.spritecollideany(self, bmbs):
+            if pygame.sprite.spritecollideany(self, bmbs).size_x <= 10:
+                pygame.sprite.spritecollideany(self, bmbs).sound.stop()
+                if self.cur_frame < len(self.frames) - 1:
+                    self.cur_frame += 1
+                return True
+            return False
+        self.image = self.frames[self.cur_frame]
