@@ -7,7 +7,7 @@ def play(plane_data, player_data):
     pygame.init()
     k_spawn = 0
     k_spawn_aa = 0
-    k_spawn_decs = 1
+    k_spawn_decs = 0
     score = 0
     size = width, height = 1000, 600
     screen = pygame.display.set_mode(size)
@@ -53,7 +53,7 @@ def play(plane_data, player_data):
         if decor.check_collision(decorations) and k_spawn_decs == 30 and decor.check_collision(enemies):
             decorations.add(decor)
         if k_spawn_aa == 150:
-            aa = AARocket(plane_data[12], player.rect.x, height)
+            aa = AARocket(plane_data[12], player.rect.x + 25, height)
             enemy_aa.add(aa)
             aa.chase()
         for rocket in enemy_aa:
@@ -88,8 +88,8 @@ def play(plane_data, player_data):
         decorations.draw(screen)
         enemies.draw(screen)
         enemy_aa.draw(screen)
-        players.draw(screen)
         bombs.draw(screen)
+        players.draw(screen)
         screen.blit(score_text, score_rect)
         screen.blit(bomb_text, bomb_rect)
         screen.blit(health_text, health_rect)

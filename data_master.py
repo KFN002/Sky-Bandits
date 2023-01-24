@@ -95,7 +95,6 @@ def show_info(player_data):
     data = sheet.get_all_values()
     players = list(map(lambda x: (x[0], x[3]), data))[1:]
     players = sorted(players, key=lambda x: int(x[1]), reverse=True)[:10]
-    print(players)
     pygame.init()
     pygame.display.set_caption('Results')
     win = mixer.Sound('data/music/win.mp3')
