@@ -96,7 +96,6 @@ class Player(pygame.sprite.Sprite):
         colided = pygame.sprite.spritecollideany(self, bullets)
         if colided:
             bullets.remove(colided)
-            self.down = True
             self.hit()
 
 
@@ -158,7 +157,7 @@ class Bomb(pygame.sprite.Sprite):
 class EnemyBase(pygame.sprite.Sprite):
     def __init__(self, speed, base_pos):
         pygame.sprite.Sprite.__init__(self)
-        self.frames = [pygame.image.load('data/hangar.png'),
+        self.frames = [pygame.image.load('data/backgrounds/hangar_dec.png'),
                        pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
                        pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
                        pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
@@ -220,6 +219,9 @@ class AARocket(pygame.sprite.Sprite):
             spo = mixer.Sound(self.spo_sound)
             spo.set_volume(0.4)
             spo.play()
+            start = mixer.Sound('data/music/missile.wav')
+            start.set_volume(0.4)
+            start.play()
 
     def aa_move(self):
         self.rect.y -= self.speed
