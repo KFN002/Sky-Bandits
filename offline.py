@@ -13,7 +13,7 @@ def test_connection(host='http://google.com'):
         screen = pygame.display.set_mode(size)
         screen.fill('black')
         pygame.display.set_caption('OFFLINE ERROR')
-        font = pygame.font.Font('freesansbold.ttf', 32)
+        font = pygame.font.Font('data/fonts/font.ttf', 32)
         text = font.render('No internet connection', True, (0, 0, 0))
         textrect = text.get_rect()
         textrect.center = (width // 2, height // 2)

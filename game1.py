@@ -15,7 +15,7 @@ def play(plane_data, player_data):
                                 'data/backgrounds/forest.png',
                                 'data/backgrounds/mountains.png'])
     background = pygame.image.load(background).convert()
-    font = pygame.font.Font('freesansbold.ttf', 20)
+    font = pygame.font.Font('data/fonts/font.ttf', 20)
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
     decorations = pygame.sprite.Group()
