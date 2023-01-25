@@ -87,13 +87,13 @@ class Player(pygame.sprite.Sprite):
             data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
 
     def check_collision(self, objects):
-        colided = pygame.sprite.spritecollideany(self, objects, pygame.sprite.collide_circle)
+        colided = pygame.sprite.spritecollideany(self, objects)
         if colided and not colided.destroyed:
             colided.kill()
             self.hit()
 
     def shot(self, bullets):
-        colided = pygame.sprite.spritecollideany(self, bullets, pygame.sprite.collide_circle)
+        colided = pygame.sprite.spritecollideany(self, bullets)
         if colided:
             bullets.remove(colided)
             self.hit()
@@ -183,12 +183,12 @@ class EnemyBase(pygame.sprite.Sprite):
         self.rect.y += self.speed
 
     def check_collision(self, objects):
-        if not pygame.sprite.spritecollideany(self, objects, pygame.sprite.collide_circle):
+        if not pygame.sprite.spritecollideany(self, objects):
             return True
         return False
 
     def bombed(self, bmbs):
-        colided = pygame.sprite.spritecollideany(self, bmbs, pygame.sprite.collide_circle)
+        colided = pygame.sprite.spritecollideany(self, bmbs)
         if colided:
             if colided.size_x <= 10:
                 colided.sound.stop()
@@ -227,7 +227,7 @@ class AARocket(pygame.sprite.Sprite):
         self.rect.y -= self.speed
 
     def check_collision(self, player):
-        if pygame.sprite.spritecollideany(self, player, pygame.sprite.collide_circle) and not self.destroyed:
+        if pygame.sprite.spritecollideany(self, player) and not self.destroyed:
             self.destroyed = True
             explosion = mixer.Sound('data/music/explosion.wav')
             explosion.set_volume(0.5)
@@ -272,12 +272,12 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.y += self.speed
 
     def check_collision(self, objects):
-        if not pygame.sprite.spritecollideany(self, objects, pygame.sprite.collide_circle):
+        if not pygame.sprite.spritecollideany(self, objects):
             return True
         return False
 
     def shot(self, bullets):
-        colided = pygame.sprite.spritecollideany(self, bullets, pygame.sprite.collide_circle)
+        colided = pygame.sprite.spritecollideany(self, bullets)
         if colided:
             bullets.remove(colided)
             self.destroyed = True
@@ -310,12 +310,12 @@ class Decorations(pygame.sprite.Sprite):
         self.rect.y += self.speed
 
     def check_collision(self, objects):
-        if not pygame.sprite.spritecollideany(self, objects, pygame.sprite.collide_circle):
+        if not pygame.sprite.spritecollideany(self, objects):
             return True
         return False
 
     def update(self, bmbs):
-        colided = pygame.sprite.spritecollideany(self, bmbs, pygame.sprite.collide_circle)
+        colided = pygame.sprite.spritecollideany(self, bmbs)
         if colided:
             if colided.size_x <= 10:
                 colided.sound.stop()
