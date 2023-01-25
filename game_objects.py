@@ -72,6 +72,7 @@ class Player(pygame.sprite.Sprite):
     def hit(self):
         self.hits -= 1
         if self.hits <= 0:
+            self.hits = 0
             self.down = True
             self.exploding = True
             self.explosion.play()
@@ -175,12 +176,12 @@ class EnemyBase(pygame.sprite.Sprite):
             self.cur_frame += 1
             self.image = self.frames[self.cur_frame]
         elif self.destroyed:
-            group.remove(self)
             self.sound.set_volume(0.5)
             self.sound.play()
+            group.remove(self)
 
-    def move(self):
-        self.rect.y += self.speed
+    def move(self, vector=1):
+        self.rect.y -= self.speed * vector
 
     def check_collision(self, objects):
         if not pygame.sprite.spritecollideany(self, objects):
@@ -198,7 +199,7 @@ class EnemyBase(pygame.sprite.Sprite):
         return False
 
 
-class AARocket(pygame.sprite.Sprite):
+class AARocket(EnemyBase):
     def __init__(self, spo_sound, x, height):
         pygame.sprite.Sprite.__init__(self)
         self.spo_sound = spo_sound
@@ -213,6 +214,8 @@ class AARocket(pygame.sprite.Sprite):
         self.rect.y = height
         self.speed = 5
         self.destroyed = False
+        self.sound = mixer.Sound('data/music/explosion.wav')
+        self.sound.set_volume(0.5)
 
     def chase(self):
         if not self.destroyed:
@@ -223,27 +226,15 @@ class AARocket(pygame.sprite.Sprite):
             start.set_volume(0.4)
             start.play()
 
-    def aa_move(self):
-        self.rect.y -= self.speed
-
     def check_collision(self, player):
         if pygame.sprite.spritecollideany(self, player) and not self.destroyed:
             self.destroyed = True
-            explosion = mixer.Sound('data/music/explosion.wav')
-            explosion.set_volume(0.5)
-            explosion.play()
+            self.sound.play()
             return True
         return False
 
-    def update_animation(self, group):
-        if self.destroyed and self.cur_frame < len(self.frames) - 1:
-            self.cur_frame = (self.cur_frame + 1)
-            self.image = self.frames[self.cur_frame]
-        elif self.destroyed:
-            group.remove(self)
 
-
-class Enemy(pygame.sprite.Sprite):
+class Enemy(EnemyBase):
     def __init__(self, speed, enemy_pos):
         pygame.sprite.Sprite.__init__(self)
         self.frames = [pygame.image.load(choice(['data/planes/mig-23-1.png', 'data/planes/mig-23-2.png'])),
@@ -258,23 +249,6 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = int(speed * 0.5)
         self.destroyed = False
         self.sound = mixer.Sound('data/music/explosion.wav')
-
-    def update_animation(self, group):
-        if self.cur_frame < len(self.frames) - 1 and self.destroyed:
-            self.cur_frame += 1
-            self.image = self.frames[self.cur_frame]
-        elif self.destroyed:
-            group.remove(self)
-            self.sound.set_volume(0.5)
-            self.sound.play()
-
-    def move(self):
-        self.rect.y += self.speed
-
-    def check_collision(self, objects):
-        if not pygame.sprite.spritecollideany(self, objects):
-            return True
-        return False
 
     def shot(self, bullets):
         colided = pygame.sprite.spritecollideany(self, bullets)
@@ -292,7 +266,7 @@ class Enemy(pygame.sprite.Sprite):
         self.destroyed = True
 
 
-class Decorations(pygame.sprite.Sprite):
+class Decorations(EnemyBase):
     def __init__(self, speed, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.building = choice(['building1', 'building2', 'building3', 'building4', 'building5', 'building6',
@@ -305,14 +279,6 @@ class Decorations(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.speed = int(speed * 0.5)
-
-    def move(self):
-        self.rect.y += self.speed
-
-    def check_collision(self, objects):
-        if not pygame.sprite.spritecollideany(self, objects):
-            return True
-        return False
 
     def update(self, bmbs):
         colided = pygame.sprite.spritecollideany(self, bmbs)

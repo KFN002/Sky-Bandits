@@ -57,15 +57,15 @@ def play(plane_data, player_data):
             enemy_aa.add(aa)
             aa.chase()
         for rocket in enemy_aa:
-            rocket.aa_move()
+            rocket.move()
             rocket.update_animation(enemy_aa)
             if rocket.check_collision(players):
                 player.hit()
         for dec in decorations:
-            dec.move()
+            dec.move(-1)
             dec.update(bombs)
         for enemy in enemies:
-            enemy.move()
+            enemy.move(-1)
             if enemy.bombed(bombs):
                 score += 1
                 player.add_bombs()
