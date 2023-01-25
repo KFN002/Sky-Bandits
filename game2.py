@@ -1,28 +1,27 @@
-from game_objects import Player, Enemy
-from images import load_image
+from game_objects import Player, EnemyBase, AARocket, Decorations, Enemy
 import pygame
-from pygame import mixer
 import random
 
 
 def play(plane_data, player_data):
-    k_spawn = 0
-    running = True
-    play_death_animation = False
-    score = 0
     pygame.init()
+    k_spawn = 0
+    k_shoot = 0
+    score = 0
     size = width, height = 1000, 600
     screen = pygame.display.set_mode(size)
-    font = pygame.font.Font('freesansbold.ttf', 20)
     background = random.choice(['data/backgrounds/jungles.png',
                                 'data/backgrounds/forest.png',
                                 'data/backgrounds/mountains.png'])
     background = pygame.image.load(background).convert()
+    font = pygame.font.Font('freesansbold.ttf', 20)
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
-    enemies_killed = pygame.sprite.Group()
+    enemy_bullets = pygame.sprite.Group()
+    player_bullets = pygame.sprite.Group()
     player = Player(plane_data)
     players.add(player)
+    running = True
     screen.fill('white')
     fps = 60
     clock = pygame.time.Clock()
@@ -36,31 +35,53 @@ def play(plane_data, player_data):
             player.move_left()
         if key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]:
             player.move_right()
-        if pygame.mouse.get_pressed()[0]:
-            player.shoot()
         for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_presses = pygame.mouse.get_pressed()
+                if mouse_presses[0]:
+                    player.shoot(player_bullets)
             if event.type == pygame.QUIT:
                 running = False
-        enemy_pos = [random.randint(0, width - 150), 0]
-        enemy_base = Enemy(plane_data[3], enemy_pos)
-        if enemy_base.check_collision(enemies) and k_spawn == 50:
-            enemies.add(enemy_base)
+        base_pos = [random.randint(0, width - 150), 0]
+        enemy = Enemy(plane_data[3], base_pos)
+        if enemy.check_collision(enemies) and k_spawn == 70:
+            enemies.add(enemy)
         for enemy in enemies:
             enemy.move()
-            if enemy.check_collision_with_player(players):
-                player.death(player_data, score)
-                play_death_animation = True
-                print('collision')
-        if play_death_animation:
-            player.update()
+            if k_shoot == 40:
+                enemy.shoot(enemy_bullets)
+            if enemy.shot(player_bullets):
+                score += 1
+                player.bullets += 1
+            enemy.update_animation(enemies)
+        for gamer in players:
+            gamer.update(players)
+            gamer.check_collision(enemies)
+            gamer.shot(enemy_bullets)
+            gamer.check_animation_status(plane_data, player_data, score, players)
+        for elem in player_bullets:
+            elem.update()
+        for elem in enemy_bullets:
+            elem.update(-1)
         score_text = font.render(f'Score: {score}', True, (255, 255, 255))
+        health_text = font.render(f'Health: {player.hits}', True, (255, 255, 255))
+        bullets_text = font.render(f'Bullets: {player.bullets}', True, (255, 255, 255))
+        bullets_rect = bullets_text.get_rect()
         score_rect = score_text.get_rect()
+        health_rect = health_text.get_rect()
+        bullets_rect.center = (900, 80)
+        health_rect.center = (900, 110)
         score_rect.center = (900, 50)
         screen.blit(background, (0, 0))
-        enemies.draw(screen)
         players.draw(screen)
+        enemies.draw(screen)
+        enemy_bullets.draw(screen)
+        player_bullets.draw(screen)
         screen.blit(score_text, score_rect)
+        screen.blit(bullets_text, bullets_rect)
+        screen.blit(health_text, health_rect)
         clock.tick(fps)
-        k_spawn = (k_spawn + 1) % 51
+        k_spawn = (k_spawn + 1) % 71
+        k_shoot = (k_shoot + 1) % 41
         pygame.display.flip()
     pygame.quit()

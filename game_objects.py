@@ -15,9 +15,11 @@ class Player(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
         self.speed = plane_data[3]
-        self.bullets = pygame.sprite.Group()
+        self.bullets = plane_data[14]
         self.bombs = int(plane_data[13])
         self.hits = int(plane_data[8])
+        self.explosion = mixer.Sound('data/music/explosion.wav')
+        self.explosion.set_volume(0.5)
         self.down = False
         self.exploding = False
         self.rect.x = 600
@@ -55,13 +57,15 @@ class Player(pygame.sprite.Sprite):
             self.exploding = False
             group.remove(self)
 
-    def shoot(self):
-        bullet = Bullet(pygame.image.load('data/bullet.png'), self.rect.x, self.rect.y, self.speed)
-        self.bullets.add(bullet)
+    def shoot(self, group):
+        if self.bullets > 0:
+            bullet = Bullet(pygame.image.load('data/arms/bullet.png'), self.speed, self.rect.midtop)
+            group.add(bullet)
+            self.bullets -= 1
 
     def drop_bomb(self, bombs):
         if self.bombs >= 1:
-            bmb = Bomb(self.rect.x, self.rect.y, self.speed)
+            bmb = Bomb(self.rect.midbottom, self.speed)
             bombs.add(bmb)
             self.bombs -= 1
 
@@ -70,6 +74,7 @@ class Player(pygame.sprite.Sprite):
         if self.hits <= 0:
             self.down = True
             self.exploding = True
+            self.explosion.play()
             mixer.stop()
 
     def add_bombs(self):
@@ -81,26 +86,38 @@ class Player(pygame.sprite.Sprite):
             mixer.stop()
             data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
 
+    def check_collision(self, objects):
+        colided = pygame.sprite.spritecollideany(self, objects)
+        if colided and not colided.destroyed:
+            colided.kill()
+            self.hit()
+
+    def shot(self, bullets):
+        colided = pygame.sprite.spritecollideany(self, bullets)
+        if colided:
+            bullets.remove(colided)
+            self.hit()
+
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, image, x, y, speed):
+    def __init__(self, image, speed, px):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.speed = speed
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = int(px[0]) - 10
+        self.rect.y = int(px[1])
         self.hit = False
+        self.sound = mixer.Sound('data/music/bullet.wav')
+        self.sound.set_volume(0.3)
+        self.sound.play()
 
-    def update(self):
-        self.rect.y -= self.speed * 2
-
-    def hit(self):
-        pass
+    def update(self, vector=1):
+        self.rect.y -= self.speed * 2 * vector
 
 
 class Bomb(pygame.sprite.Sprite):
-    def __init__(self, x, y, speed):
+    def __init__(self, mid_bottom, speed):
         pygame.sprite.Sprite.__init__(self)
         self.frames = [pygame.image.load('data/arms/bomb.png'),
                        pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
@@ -110,8 +127,8 @@ class Bomb(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
         self.speed = speed * 0.5
         self.rect = self.image.get_rect()
-        self.rect.x = x + 60
-        self.rect.y = y + 70
+        self.rect.x = mid_bottom[0] - 10
+        self.rect.y = mid_bottom[1] - 60
         self.size_x = 20
         self.size_y = 36
         self.hit = False
@@ -140,7 +157,7 @@ class Bomb(pygame.sprite.Sprite):
 class EnemyBase(pygame.sprite.Sprite):
     def __init__(self, speed, base_pos):
         pygame.sprite.Sprite.__init__(self)
-        self.frames = [pygame.image.load('data/hangar.png'),
+        self.frames = [pygame.image.load('data/backgrounds/hangar_dec.png'),
                        pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
                        pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
                        pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
@@ -171,10 +188,11 @@ class EnemyBase(pygame.sprite.Sprite):
         return False
 
     def bombed(self, bmbs):
-        if pygame.sprite.spritecollideany(self, bmbs):
-            if pygame.sprite.spritecollideany(self, bmbs).size_x <= 10:
-                pygame.sprite.spritecollideany(self, bmbs).sound.stop()
-                bmbs.remove(pygame.sprite.spritecollideany(self, bmbs))
+        colided = pygame.sprite.spritecollideany(self, bmbs)
+        if colided:
+            if colided.size_x <= 10:
+                colided.sound.stop()
+                bmbs.remove(colided)
                 self.destroyed = True
                 return True
         return False
@@ -201,6 +219,9 @@ class AARocket(pygame.sprite.Sprite):
             spo = mixer.Sound(self.spo_sound)
             spo.set_volume(0.4)
             spo.play()
+            start = mixer.Sound('data/music/missile.wav')
+            start.set_volume(0.4)
+            start.play()
 
     def aa_move(self):
         self.rect.y -= self.speed
@@ -225,36 +246,50 @@ class AARocket(pygame.sprite.Sprite):
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, speed, enemy_pos):
         pygame.sprite.Sprite.__init__(self)
-        self.frames = [pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
+        self.frames = [pygame.image.load(choice(['data/planes/mig-23-1.png', 'data/planes/mig-23-2.png'])),
+                       pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
                        pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
                        pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
-        self.frames.append(pygame.image.load(choice(['data/planes/mig-23-1.png', 'data/planes/mig-23-2.png'])))
-        self.cur_frame = len(self.frames) - 1
+        self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.image.get_rect()
         self.rect.x = enemy_pos[0]
         self.rect.y = enemy_pos[1]
         self.speed = int(speed * 0.5)
         self.destroyed = False
+        self.sound = mixer.Sound('data/music/explosion.wav')
 
-    def update(self):
-        if self.destroyed:
-            self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+    def update_animation(self, group):
+        if self.cur_frame < len(self.frames) - 1 and self.destroyed:
+            self.cur_frame += 1
             self.image = self.frames[self.cur_frame]
+        elif self.destroyed:
+            group.remove(self)
+            self.sound.set_volume(0.5)
+            self.sound.play()
 
     def move(self):
-        if not self.destroyed:
-            self.rect.y += self.speed
+        self.rect.y += self.speed
 
     def check_collision(self, objects):
         if not pygame.sprite.spritecollideany(self, objects):
             return True
         return False
 
-    def check_collision_with_player(self, player):
-        if pygame.sprite.spritecollideany(self, player):
+    def shot(self, bullets):
+        colided = pygame.sprite.spritecollideany(self, bullets)
+        if colided:
+            bullets.remove(colided)
+            self.destroyed = True
             return True
         return False
+
+    def shoot(self, group):
+        bullet = Bullet(pygame.image.load('data/arms/bullet.png'), self.speed, self.rect.midbottom)
+        group.add(bullet)
+
+    def kill(self):
+        self.destroyed = True
 
 
 class Decorations(pygame.sprite.Sprite):
@@ -280,9 +315,10 @@ class Decorations(pygame.sprite.Sprite):
         return False
 
     def update(self, bmbs):
-        if pygame.sprite.spritecollideany(self, bmbs):
-            if pygame.sprite.spritecollideany(self, bmbs).size_x <= 10:
-                pygame.sprite.spritecollideany(self, bmbs).sound.stop()
+        colided = pygame.sprite.spritecollideany(self, bmbs)
+        if colided:
+            if colided.size_x <= 10:
+                colided.sound.stop()
                 if self.cur_frame < len(self.frames) - 1:
                     self.cur_frame += 1
                 return True
