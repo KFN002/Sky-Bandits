@@ -47,7 +47,7 @@ def play(plane_data, player_data):
             enemies.add(enemy)
         for enemy in enemies:
             enemy.move()
-            if k_shoot == 40:
+            if k_shoot == 80:
                 enemy.shoot(enemy_bullets)
             if enemy.shot(player_bullets):
                 score += 1
@@ -80,6 +80,6 @@ def play(plane_data, player_data):
         screen.blit(health_text, health_rect)
         clock.tick(fps)
         k_spawn = (k_spawn + 1) % 71
-        k_shoot = (k_shoot + 1) % 41
+        k_shoot = (k_shoot + 1) % 81
         pygame.display.flip()
     pygame.quit()
