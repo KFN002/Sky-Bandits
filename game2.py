@@ -47,7 +47,7 @@ def play(plane_data, player_data):
         if enemy.check_collision(enemies) and k_spawn == 70:
             enemies.add(enemy)
         for enemy in enemies:
-            enemy.move(-1)
+            enemy.move()
             if k_shoot == 40:
                 enemy.shoot(enemy_bullets)
             if enemy.shot(player_bullets):
