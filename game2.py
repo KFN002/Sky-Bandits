@@ -14,7 +14,7 @@ def play(plane_data, player_data):
                                 'data/backgrounds/forest.png',
                                 'data/backgrounds/mountains.png'])
     background = pygame.image.load(background).convert()
-    font = pygame.font.Font('data/fonts/font.ttf', 20)
+    font = pygame.font.Font('data/fonts/font.ttf', 30)
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
     enemy_bullets = pygame.sprite.Group()
@@ -55,10 +55,9 @@ def play(plane_data, player_data):
                 player.bullets += 1
             enemy.update_animation(enemies)
         for gamer in players:
-            gamer.update(players)
+            gamer.update(players, player_data, plane_data, score)
             gamer.check_collision(enemies)
             gamer.shot(enemy_bullets)
-            gamer.check_animation_status(plane_data, player_data, score, players)
         for elem in player_bullets:
             elem.update()
         for elem in enemy_bullets:
