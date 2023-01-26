@@ -44,12 +44,10 @@ def play(plane_data, player_data):
                     player.drop_bomb(bombs)
             if event.type == pygame.QUIT:
                 running = False
-        base_pos = [random.randint(0, width - 150), 0]
-        enemy_base = EnemyBase(plane_data[3], base_pos)
+        enemy_base = EnemyBase(plane_data[3], [random.randint(0, width - 150), 0])
         if enemy_base.check_collision(enemies) and k_spawn == 50 and enemy_base.check_collision(decorations):
             enemies.add(enemy_base)
-        dec_pos = [random.randint(0, width - 150), 0]
-        decor = Decorations(plane_data[3], *dec_pos)
+        decor = Decorations(plane_data[3], *[random.randint(0, width - 150), 0])
         if decor.check_collision(decorations) and k_spawn_decs == 30 and decor.check_collision(enemies):
             decorations.add(decor)
         if k_spawn_aa == 150:
