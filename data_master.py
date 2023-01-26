@@ -120,6 +120,7 @@ def show_info(player_data):
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and continue_btn._mouseover and event.button == 1:
+                win.stop()
                 game_menu.start(player_data)
             if event.type == pygame.QUIT:
                 exit()
