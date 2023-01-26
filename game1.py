@@ -15,7 +15,7 @@ def play(plane_data, player_data):
                                 'data/backgrounds/forest.png',
                                 'data/backgrounds/mountains.png'])
     background = pygame.image.load(background).convert()
-    font = pygame.font.Font('data/fonts/font.ttf', 20)
+    font = pygame.font.Font('data/fonts/font.ttf', 30)
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
     decorations = pygame.sprite.Group()
@@ -57,15 +57,16 @@ def play(plane_data, player_data):
             enemy_aa.add(aa)
             aa.chase()
         for rocket in enemy_aa:
-            rocket.move()
+            rocket.move(-1)
             rocket.update_animation(enemy_aa)
-            if rocket.check_collision(players):
+            if not rocket.check_collision(players):
+                rocket.exploded()
                 player.hit()
         for dec in decorations:
-            dec.move(-1)
+            dec.move()
             dec.update(bombs)
         for enemy in enemies:
-            enemy.move(-1)
+            enemy.move()
             if enemy.bombed(bombs):
                 score += 1
                 player.add_bombs()
@@ -73,8 +74,7 @@ def play(plane_data, player_data):
         for bmb in bombs:
             bmb.update(bombs)
         for gamer in players:
-            gamer.update(players)
-            gamer.check_animation_status(plane_data, player_data, score, players)
+            gamer.update(players, player_data, plane_data, score)
         score_text = font.render(f'Score: {score}', True, (255, 255, 255))
         bomb_text = font.render(f'Bombs: {player.bombs}', True, (255, 255, 255))
         health_text = font.render(f'Health: {player.hits}', True, (255, 255, 255))

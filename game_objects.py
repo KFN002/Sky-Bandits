@@ -4,17 +4,44 @@ import data_master
 from random import choice
 
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, plane_data):
+class BasicSprite(pygame.sprite.Sprite):
+    def __init__(self, frames, speed):
         pygame.sprite.Sprite.__init__(self)
-        self.frames = [pygame.image.load(plane_data[5]),
-                       pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
-                       pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
-                       pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
+        self.frames = frames
         self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
+        self.image = frames[self.cur_frame]
         self.rect = self.image.get_rect()
-        self.speed = plane_data[3]
+        self.speed = speed
+        self.destroyed = False
+
+    def update_animation(self, group):
+        if self.cur_frame < len(self.frames) - 1 and self.destroyed:
+            self.cur_frame += 1
+            self.image = self.frames[self.cur_frame]
+        elif self.destroyed:
+            group.remove(self)
+            self.sound.set_volume(0.5)
+            self.sound.play()
+
+    def move(self, vector=1):
+        self.rect.y += self.speed * vector
+
+    def check_collision(self, objects):
+        if not pygame.sprite.spritecollideany(self, objects):
+            return True
+        return False
+
+
+class Player(BasicSprite):
+    def __init__(self, plane_data):
+        BasicSprite.__init__(self, [pygame.image.load(plane_data[5]),
+                                    pygame.image.load('data/booms/boom1.png'),
+                                    pygame.image.load('data/booms/boom2.png'),
+                                    pygame.image.load('data/booms/boom3.png'),
+                                    pygame.image.load('data/booms/boom4.png'),
+                                    pygame.image.load('data/booms/boom5.png'),
+                                    pygame.image.load('data/booms/boom6.png')],
+                             plane_data[3])
         self.bullets = plane_data[14]
         self.bombs = int(plane_data[13])
         self.hits = int(plane_data[8])
@@ -49,13 +76,17 @@ class Player(pygame.sprite.Sprite):
         else:
             self.rect.x += self.speed
 
-    def update(self, group):
+    def update(self, group, player_data, plane_data, score):
         if self.down and self.cur_frame < len(self.frames) - 1 and self.exploding:
             self.cur_frame += 1
             self.image = self.frames[self.cur_frame]
         elif self.down:
             self.exploding = False
             group.remove(self)
+        if self.down and not self.exploding:
+            group.remove(self)
+            mixer.stop()
+            data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
 
     def shoot(self, group):
         if self.bullets > 0:
@@ -80,12 +111,6 @@ class Player(pygame.sprite.Sprite):
 
     def add_bombs(self):
         self.bombs += 1
-
-    def check_animation_status(self, plane_data, player_data, score, group):
-        if self.down and not self.exploding:
-            group.remove(self)
-            mixer.stop()
-            data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
 
     def check_collision(self, objects):
         colided = pygame.sprite.spritecollideany(self, objects)
@@ -117,17 +142,16 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y -= self.speed * 2 * vector
 
 
-class Bomb(pygame.sprite.Sprite):
+class Bomb(BasicSprite):
     def __init__(self, mid_bottom, speed):
-        pygame.sprite.Sprite.__init__(self)
-        self.frames = [pygame.image.load('data/arms/bomb.png'),
-                       pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
-                       pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
-                       pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.speed = speed * 0.5
-        self.rect = self.image.get_rect()
+        BasicSprite.__init__(self, [pygame.image.load('data/arms/bomb.png'),
+                                    pygame.image.load('data/booms/boom1.png'),
+                                    pygame.image.load('data/booms/boom2.png'),
+                                    pygame.image.load('data/booms/boom3.png'),
+                                    pygame.image.load('data/booms/boom4.png'),
+                                    pygame.image.load('data/booms/boom5.png'),
+                                    pygame.image.load('data/booms/boom6.png')],
+                             speed * 0.5)
         self.rect.x = mid_bottom[0] - 10
         self.rect.y = mid_bottom[1] - 60
         self.size_x = 20
@@ -155,38 +179,19 @@ class Bomb(pygame.sprite.Sprite):
             group.remove(self)
 
 
-class EnemyBase(pygame.sprite.Sprite):
+class EnemyBase(BasicSprite):
     def __init__(self, speed, base_pos):
-        pygame.sprite.Sprite.__init__(self)
-        self.frames = [pygame.image.load('data/backgrounds/hangar_dec.png'),
-                       pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
-                       pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
-                       pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.rect = self.image.get_rect()
+        BasicSprite.__init__(self, [pygame.image.load('data/backgrounds/hangar_dec.png'),
+                                    pygame.image.load('data/booms/boom1.png'),
+                                    pygame.image.load('data/booms/boom2.png'),
+                                    pygame.image.load('data/booms/boom3.png'),
+                                    pygame.image.load('data/booms/boom4.png'),
+                                    pygame.image.load('data/booms/boom5.png'),
+                                    pygame.image.load('data/booms/boom6.png')],
+                             speed * 0.5)
         self.rect.x = base_pos[0]
         self.rect.y = base_pos[1]
-        self.speed = int(speed * 0.5)
-        self.destroyed = False
         self.sound = mixer.Sound('data/music/explosion.wav')
-
-    def update_animation(self, group):
-        if self.cur_frame < len(self.frames) - 1 and self.destroyed:
-            self.cur_frame += 1
-            self.image = self.frames[self.cur_frame]
-        elif self.destroyed:
-            self.sound.set_volume(0.5)
-            self.sound.play()
-            group.remove(self)
-
-    def move(self, vector=1):
-        self.rect.y -= self.speed * vector
-
-    def check_collision(self, objects):
-        if not pygame.sprite.spritecollideany(self, objects):
-            return True
-        return False
 
     def bombed(self, bmbs):
         colided = pygame.sprite.spritecollideany(self, bmbs)
@@ -199,21 +204,18 @@ class EnemyBase(pygame.sprite.Sprite):
         return False
 
 
-class AARocket(EnemyBase):
+class AARocket(BasicSprite):
     def __init__(self, spo_sound, x, height):
-        pygame.sprite.Sprite.__init__(self)
+        BasicSprite.__init__(self, [pygame.image.load('data/arms/aa_rocket.png'),
+                                    pygame.image.load('data/booms/boom1.png'),
+                                    pygame.image.load('data/booms/boom2.png'),
+                                    pygame.image.load('data/booms/boom3.png'),
+                                    pygame.image.load('data/booms/boom4.png'),
+                                    pygame.image.load('data/booms/boom5.png'),
+                                    pygame.image.load('data/booms/boom6.png')], 5)
         self.spo_sound = spo_sound
-        self.frames = [pygame.image.load('data/arms/aa_rocket.png'),
-                       pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
-                       pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
-                       pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = height
-        self.speed = 5
-        self.destroyed = False
         self.sound = mixer.Sound('data/music/explosion.wav')
         self.sound.set_volume(0.5)
 
@@ -226,28 +228,21 @@ class AARocket(EnemyBase):
             start.set_volume(0.4)
             start.play()
 
-    def check_collision(self, player):
-        if pygame.sprite.spritecollideany(self, player) and not self.destroyed:
-            self.destroyed = True
-            self.sound.play()
-            return True
-        return False
+    def exploded(self):
+        self.destroyed = True
 
 
-class Enemy(EnemyBase):
+class Enemy(BasicSprite):
     def __init__(self, speed, enemy_pos):
-        pygame.sprite.Sprite.__init__(self)
-        self.frames = [pygame.image.load(choice(['data/planes/mig-23-1.png', 'data/planes/mig-23-2.png'])),
-                       pygame.image.load('data/booms/boom1.png'), pygame.image.load('data/booms/boom2.png'),
-                       pygame.image.load('data/booms/boom3.png'), pygame.image.load('data/booms/boom4.png'),
-                       pygame.image.load('data/booms/boom5.png'), pygame.image.load('data/booms/boom6.png')]
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.rect = self.image.get_rect()
+        BasicSprite.__init__(self, [pygame.image.load(choice(['data/planes/mig-23-1.png', 'data/planes/mig-23-2.png'])),
+                                    pygame.image.load('data/booms/boom1.png'),
+                                    pygame.image.load('data/booms/boom2.png'),
+                                    pygame.image.load('data/booms/boom3.png'),
+                                    pygame.image.load('data/booms/boom4.png'),
+                                    pygame.image.load('data/booms/boom5.png'),
+                                    pygame.image.load('data/booms/boom6.png')], speed * 0.5)
         self.rect.x = enemy_pos[0]
         self.rect.y = enemy_pos[1]
-        self.speed = int(speed * 0.5)
-        self.destroyed = False
         self.sound = mixer.Sound('data/music/explosion.wav')
 
     def shot(self, bullets):
@@ -266,19 +261,14 @@ class Enemy(EnemyBase):
         self.destroyed = True
 
 
-class Decorations(EnemyBase):
+class Decorations(BasicSprite):
     def __init__(self, speed, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        self.building = choice(['building1', 'building2', 'building3', 'building4', 'building5', 'building6',
-                               'building7'])
-        self.frames = [pygame.image.load(f'data/backgrounds/{self.building}/image1.png'),
-                       pygame.image.load(f'data/backgrounds/{self.building}/image4.png')]
-        self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
-        self.rect = self.image.get_rect()
+        building = choice(['building1', 'building2', 'building3', 'building4', 'building5', 'building6',
+                           'building7'])
+        BasicSprite.__init__(self, [pygame.image.load(f'data/backgrounds/{building}/image1.png'),
+                                    pygame.image.load(f'data/backgrounds/{building}/image4.png')], speed * 0.5)
         self.rect.x = x
         self.rect.y = y
-        self.speed = int(speed * 0.5)
 
     def update(self, bmbs):
         colided = pygame.sprite.spritecollideany(self, bmbs)
