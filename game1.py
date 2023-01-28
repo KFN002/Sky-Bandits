@@ -9,7 +9,7 @@ def play(plane_data, player_data):
     k_spawn_aa = 0
     k_spawn_decs = 0
     score = 0
-    size = width, height = 1000, 600
+    size = width, height = 1200, 600
     screen = pygame.display.set_mode(size)
     background = random.choice(['data/backgrounds/jungles.png',
                                 'data/backgrounds/forest.png',
@@ -32,15 +32,14 @@ def play(plane_data, player_data):
         if key_pressed[pygame.K_w] or key_pressed[pygame.K_UP]:
             player.move_up()
         if key_pressed[pygame.K_s] or key_pressed[pygame.K_DOWN]:
-            player.move_down()
+            player.move_down(height)
         if key_pressed[pygame.K_a] or key_pressed[pygame.K_LEFT]:
             player.move_left()
         if key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]:
-            player.move_right()
+            player.move_right(width)
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_presses = pygame.mouse.get_pressed()
-                if mouse_presses[0]:
+                if pygame.mouse.get_pressed()[0]:
                     player.drop_bomb(bombs)
             if event.type == pygame.QUIT:
                 running = False
@@ -79,9 +78,9 @@ def play(plane_data, player_data):
         score_rect = score_text.get_rect()
         bomb_rect = bomb_text.get_rect()
         health_rect = health_text.get_rect()
-        health_rect.center = (900, 110)
-        bomb_rect.center = (900, 80)
-        score_rect.center = (900, 50)
+        health_rect.center = (width - 100, 110)
+        bomb_rect.center = (width - 100, 80)
+        score_rect.center = (width - 100, 50)
         screen.blit(background, (0, 0))
         decorations.draw(screen)
         enemies.draw(screen)

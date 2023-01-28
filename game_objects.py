@@ -58,9 +58,9 @@ class Player(BasicSprite):
         else:
             self.rect.y -= self.speed
 
-    def move_down(self):
-        if self.rect.y >= 600 - self.rect.height:
-            self.rect.y = 600 - self.rect.height
+    def move_down(self, height):
+        if self.rect.y >= height - self.rect.height:
+            self.rect.y = height - self.rect.height
         else:
             self.rect.y += self.speed
 
@@ -70,9 +70,9 @@ class Player(BasicSprite):
         else:
             self.rect.x -= self.speed
 
-    def move_right(self):
-        if self.rect.x >= 1000 - self.rect.width:
-            self.rect.x = 1000 - self.rect.width
+    def move_right(self, width):
+        if self.rect.x >= width - self.rect.width:
+            self.rect.x = width - self.rect.width
         else:
             self.rect.x += self.speed
 
