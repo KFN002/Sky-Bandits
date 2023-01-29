@@ -41,7 +41,7 @@ def play(plane_data, player_data):
                     player.shoot(player_bullets)
             if event.type == pygame.QUIT:
                 running = False
-        enemy = Enemy(plane_data[3], [random.randint(0, width - 150), 0])
+        enemy = Enemy([random.randint(0, width - 150), 0])
         if enemy.check_collision(enemies) and k_spawn == 70:
             enemies.add(enemy)
         for enemy in enemies:

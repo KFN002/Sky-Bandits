@@ -97,7 +97,7 @@ def show_info(player_data):
     mixer.music.set_volume(0.2)
     mixer.music.play(-1)
     background = pygame_menu.baseimage.BaseImage('data/backgrounds/background.jpg')
-    sc_size = width, height = 1200, 600
+    sc_size = width, height = 1200, 650
     surface = pygame.display.set_mode(sc_size)
     my_theme = Theme(background_color=(0, 0, 0, 0), title_background_color=(4, 47, 126),
                      title_font_shadow=True, title_font=pygame_menu.font.FONT_8BIT,
@@ -106,11 +106,12 @@ def show_info(player_data):
                      widget_font_color=pygame.Color('white'))
     my_theme.background_color = background
     menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
+    menu.add.label('GAME OVER', font_size=50)
     menu.add.label('Leaderboard')
     table = menu.add.table(font_size=30, border_color=pygame.Color('white'), border_width=3)
     for gamer in players:
         table.add_row(gamer)
-    continue_btn = menu.add.button('Continue', font_size=40)
+    continue_btn = menu.add.button('Continue', font_size=35)
     menu.add.button('Quit', pygame_menu.events.EXIT, font_size=30)
     menu.center_content()
     engine = sound.Sound(-1)

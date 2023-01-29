@@ -56,7 +56,7 @@ def play(plane_data, player_data):
         for rocket in enemy_aa:
             rocket.move(-1)
             rocket.update_animation(enemy_aa)
-            if not rocket.check_collision(players):
+            if not rocket.check_collision(players) and not rocket.destroyed:
                 rocket.exploded()
                 player.hit()
         for dec in decorations:
