@@ -10,13 +10,13 @@ from show_info import redirect
 from random import choice
 
 
-def compare_data(plane, planes_available, all_planes):
+def compare_data(plane, planes_available, all_planes):   # проврека наличия самолета в приобритенных
     planes_available = list(str(planes_available))
     all_planes = list(map(lambda x: x[0], all_planes))
     return planes_available[all_planes.index(plane[0][0])]
 
 
-def draw_background(plane, buy_btn, pic, planes_available, all_planes):
+def draw_background(plane, buy_btn, pic, planes_available, all_planes):  # подгрузка пикчи самолета, покупка
     con = sqlite3.connect('planes.db')
     cur = con.cursor()
     result = cur.execute(f"""SELECT hist_pic, hist_text, price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
@@ -28,7 +28,7 @@ def draw_background(plane, buy_btn, pic, planes_available, all_planes):
         buy_btn.set_title(f'Buy {result[2]}')
 
 
-def start_game(plane_status, plane, player_data):
+def start_game(plane_status, plane, player_data):   # запуск уровня, подгрузка данных
     if plane_status.get_title() == '':
         con = sqlite3.connect('planes.db')
         cur = con.cursor()
@@ -44,7 +44,7 @@ def start_game(plane_status, plane, player_data):
             game2.play(list(plane_data), player_data)
 
 
-def buy_plane(plane, player_data, planes_available, all_planes, menu):
+def buy_plane(plane, player_data, planes_available, all_planes, menu):   # покупка самолета
     con = sqlite3.connect('planes.db')
     cur = con.cursor()
     result = cur.execute(f"""SELECT price FROM planes WHERE model = '{plane[0][0]}'""").fetchone()
@@ -55,7 +55,7 @@ def buy_plane(plane, player_data, planes_available, all_planes, menu):
         start(data_master.check_player(*player_data[:2]))
 
 
-def start(player_data):
+def start(player_data):   # меню с выбором самолета, приобритениием его
     pygame.init()
     planes = []
     con = sqlite3.connect('planes.db')
@@ -96,7 +96,8 @@ def start(player_data):
     while running:
         draw_background(current_plane.get_value(), buy_button, pic_place, player_data[4], planes)
         events = pygame.event.get()
-        for event in events:
+        for event in events:  # проверка кнопок: сделанно именно так, тк встроенные функции не полностью удовлетворяли
+            # нужному функционалу
             if event.type == pygame.MOUSEBUTTONDOWN and buy_button._mouseover and event.button == 1:
                 buy_plane(current_plane.get_value(), player_data, player_data[4], planes, menu)
             if event.type == pygame.MOUSEBUTTONDOWN and start_btn._mouseover and event.button == 1:

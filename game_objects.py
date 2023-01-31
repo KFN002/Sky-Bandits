@@ -5,7 +5,7 @@ from random import choice
 import threading
 
 
-class BasicSprite(pygame.sprite.Sprite):
+class BasicSprite(pygame.sprite.Sprite):   # базовый спрайт с базовым функционалом
     def __init__(self, frames, speed):
         pygame.sprite.Sprite.__init__(self)
         self.frames = frames
@@ -33,7 +33,7 @@ class BasicSprite(pygame.sprite.Sprite):
         return False
 
 
-class Player(BasicSprite):
+class Player(BasicSprite):   # спрайт игрока: большинство названий говорящие, как и во всех других српайтах
     def __init__(self, plane_data):
         BasicSprite.__init__(self, [pygame.image.load(plane_data[5]),
                                     pygame.image.load('data/booms/boom1.png'),

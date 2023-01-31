@@ -3,7 +3,7 @@ import pygame
 import random
 
 
-def play(plane_data, player_data):
+def play(plane_data, player_data):   # уровень вомбежка
     pygame.init()
     k_spawn = 0
     k_spawn_aa = 0
@@ -13,7 +13,7 @@ def play(plane_data, player_data):
     screen = pygame.display.set_mode(size)
     background = random.choice(['data/backgrounds/jungles.png',
                                 'data/backgrounds/forest.png',
-                                'data/backgrounds/mountains.png'])
+                                'data/backgrounds/mountains.png'])  # выбор карты
     background = pygame.image.load(background).convert()
     font = pygame.font.Font('data/fonts/font.ttf', 30)
     enemies = pygame.sprite.Group()
@@ -29,7 +29,7 @@ def play(plane_data, player_data):
     clock = pygame.time.Clock()
     while running:
         key_pressed = pygame.key.get_pressed()
-        if key_pressed[pygame.K_w] or key_pressed[pygame.K_UP]:
+        if key_pressed[pygame.K_w] or key_pressed[pygame.K_UP]:  # базовая обработка событий
             player.move_up()
         if key_pressed[pygame.K_s] or key_pressed[pygame.K_DOWN]:
             player.move_down(height)
@@ -38,22 +38,22 @@ def play(plane_data, player_data):
         if key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]:
             player.move_right(width)
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN:   # кидание бомбы
                 if pygame.mouse.get_pressed()[0]:
                     player.drop_bomb(bombs)
             if event.type == pygame.QUIT:
                 running = False
-        enemy_base = EnemyBase(plane_data[3], [random.randint(0, width - 150), 0])
+        enemy_base = EnemyBase(plane_data[3], [random.randint(0, width - 150), 0])  # спавн базы
         if enemy_base.check_collision(enemies) and k_spawn == 50 and enemy_base.check_collision(decorations):
             enemies.add(enemy_base)
-        decor = Decorations(plane_data[3], *[random.randint(0, width - 150), 0])
+        decor = Decorations(plane_data[3], *[random.randint(0, width - 150), 0])  # спавн декорации
         if decor.check_collision(decorations) and k_spawn_decs == 30 and decor.check_collision(enemies):
             decorations.add(decor)
-        if k_spawn_aa == 150:
+        if k_spawn_aa == 150:  # спавн ракеты s75 двина
             aa = AARocket(plane_data[12], player.rect.x + 25, height)
             enemy_aa.add(aa)
             aa.chase()
-        for rocket in enemy_aa:
+        for rocket in enemy_aa:   # далее идет работа со спрайтами:
             rocket.move(-1)
             rocket.update_animation(enemy_aa)
             if not rocket.check_collision(players) and not rocket.destroyed:

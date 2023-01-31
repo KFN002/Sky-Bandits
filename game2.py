@@ -3,7 +3,7 @@ import pygame
 import random
 
 
-def play(plane_data, player_data):
+def play(plane_data, player_data):  # аналогично 1 уровню, но с вражескими самолетами
     pygame.init()
     k_spawn = 0
     k_shoot = 0

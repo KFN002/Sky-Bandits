@@ -8,14 +8,15 @@ import pygame
 from pygame import mixer
 import game_menu
 
-'''
+'''  
+поделится и создать страницу
 name = 'Sky Bandits: players'
 sheet = client.create(name)
 sheet.share('fedotovkirill4000@gmail.com', perm_type='user', role='writer')
 '''
 
 
-def connect():
+def connect():   # подключение к таблице
     if offline.test_connection():
         scope = ['https://www.googleapis.com/auth/spreadsheets',
                  "https://www.googleapis.com/auth/drive"]
@@ -27,7 +28,7 @@ def connect():
         exit()
 
 
-def check_player(name, password):
+def check_player(name, password):  # проверка пароля и логина игрока, создание акка
     sheet_check = connect()
     data = sheet_check.get_all_values()
     players = list(map(lambda x: x[:2], data))
@@ -45,7 +46,7 @@ def check_player(name, password):
     return [name, password, 100, 0, planes]
 
 
-def change_value(price, player_data, plane):
+def change_value(price, player_data, plane):   # покупка самолета
     sheet = connect()
     data = sheet.get_all_values()
     players = list(map(lambda x: x[:2], data))
@@ -66,13 +67,13 @@ def change_value(price, player_data, plane):
         sheet.update_cell(row + 1, 5, int(planes_own))
 
 
-def game_update(planes_added):
+def game_update(planes_added):   # подгрузка новых самолетов из бд по кнопке start_menu
     sheet = connect()
     for row in range(1, len(sheet.get_all_values())):
         sheet.update_cell(row + 1, 5, int(str(sheet.cell(row + 1, 5).value) + '0' * planes_added))
 
 
-def change_score_money(player_data, score):
+def change_score_money(player_data, score):   # апдейт денег, рекорда
     sheet = connect()
     data = sheet.get_all_values()
     players = list(map(lambda x: x[:2], data))
@@ -82,7 +83,7 @@ def change_score_money(player_data, score):
         sheet.update_cell(row + 1, 4, score)
 
 
-def show_info(player_data):
+def show_info(player_data):  # показ лидербоарда, кнопки: отдельное меню
     sheet = connect()
     data = sheet.get_all_values()
     players = list(map(lambda x: (x[0], x[3]), data))[1:]

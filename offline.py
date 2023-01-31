@@ -3,7 +3,7 @@ import pygame
 import time
 
 
-def test_connection(host='http://google.com'):
+def test_connection(host='http://google.com'):  # проверка подключения игрока к сети
     try:
         urllib.request.urlopen(host)
         return True

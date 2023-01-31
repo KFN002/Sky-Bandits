@@ -8,7 +8,7 @@ import game_menu
 from data_master import check_player
 
 
-def start_game(menu):
+def start_game(menu):  # проверка введенных данных, запуск следующего меню
     player_info = list(menu.get_input_data().values())
     if len(player_info[0]) >= 4 and len(player_info[1]) >= 4:
         data = check_player(*player_info)
@@ -22,12 +22,12 @@ def start_game(menu):
         menu.reset_value()
 
 
-def start_menu():
+def start_menu():  # стартовое меню
     pygame.init()
     pygame.display.set_caption('Sky Bandits')
     mixer.music.load('data/music/theme.mp3')
     mixer.music.set_volume(0.2)
-    mixer.music.play(-1)
+    mixer.music.play(-1)   # фоновая музыка
     background = pygame_menu.baseimage.BaseImage('data/backgrounds/background.jpg')
     sc_size = width, height = 1200, 600
     surface = pygame.display.set_mode(sc_size)
@@ -50,7 +50,7 @@ def start_menu():
                    font_color=pygame.Color('grey'), font_size=8)
     added_planes = menu.add.button('Update planes from DB', font_size=8, align=pygame_menu.locals.ALIGN_LEFT)
     engine = sound.Sound(-1)
-    engine.set_sound(pygame_menu.sound.SOUND_TYPE_CLICK_MOUSE, 'data/music/button.wav')
+    engine.set_sound(pygame_menu.sound.SOUND_TYPE_CLICK_MOUSE, 'data/music/button.wav')   # звкововой движок
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_KEY_ADDITION, 'data/music/button.wav')
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_KEY_DELETION, 'data/music/button.wav')
     menu.set_sound(engine, recursive=True)
@@ -58,8 +58,8 @@ def start_menu():
     while running:
         events = pygame.event.get()
         if play_btn.is_selected():
-            start_game(menu)
-        if added_planes.is_selected():
+            start_game(menu)  # начало игры
+        if added_planes.is_selected():  # апдейт самолетов
             con = sqlite3.connect('planes.db')
             cur = con.cursor()
             plane_quantity = cur.execute(f"""SELECT COUNT(*) FROM planes""").fetchone()
