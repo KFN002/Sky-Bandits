@@ -2,6 +2,7 @@ import pygame
 from pygame import mixer
 import data_master
 from random import choice
+import threading
 
 
 class BasicSprite(pygame.sprite.Sprite):
@@ -86,7 +87,10 @@ class Player(BasicSprite):
         if self.down and not self.exploding:
             group.remove(self)
             mixer.stop()
-            data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
+            add_points = threading.Thread(target=data_master.change_score_money(player_data, int(int(plane_data[7])
+                                                                                                 * score)))
+            add_points.start()
+            data_master.show_info(player_data)
 
     def shoot(self, group):
         if self.bullets > 0:

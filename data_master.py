@@ -80,7 +80,6 @@ def change_score_money(player_data, score):
     sheet.update_cell(row + 1, 3, (int(sheet.cell(row + 1, 3).value) + score))
     if score > int(sheet.cell(row + 1, 4).value):
         sheet.update_cell(row + 1, 4, score)
-    show_info(player_data)
 
 
 def show_info(player_data):
