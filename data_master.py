@@ -67,10 +67,12 @@ def change_value(price, player_data, plane):   # покупка самолета
         sheet.update_cell(row + 1, 5, int(planes_own))
 
 
-def game_update(planes_added):   # подгрузка новых самолетов из бд по кнопке start_menu
+def game_update(planes_added, quantity):   # подгрузка новых самолетов из бд по кнопке start_menu
     sheet = connect()
     for row in range(1, len(sheet.get_all_values())):
         sheet.update_cell(row + 1, 5, int(str(sheet.cell(row + 1, 5).value) + '0' * planes_added))
+    with open('planes_q.txt', 'wt', encoding='utf-8', newline='\n') as file:
+        file.write(quantity + planes_added)
 
 
 def change_score_money(player_data, score):   # апдейт денег, рекорда

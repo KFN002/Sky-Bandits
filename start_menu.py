@@ -54,6 +54,8 @@ def start_menu():  # стартовое меню, логин и тд
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_KEY_ADDITION, 'data/music/button.wav')
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_KEY_DELETION, 'data/music/button.wav')
     menu.set_sound(engine, recursive=True)
+    with open('planes_q.txt', 'rt', encoding='utf-8', newline='\n') as file:
+        quantity = int(file.read())
     running = True
     while running:
         events = pygame.event.get()
@@ -64,8 +66,8 @@ def start_menu():  # стартовое меню, логин и тд
             cur = con.cursor()
             plane_quantity = cur.execute(f"""SELECT COUNT(*) FROM planes""").fetchone()
             con.close()
-            if int(plane_quantity[0]) - 10 >= 1:
-                data_master.game_update(int(plane_quantity[0]) - 10)
+            if int(plane_quantity[0]) - quantity >= 1:
+                data_master.game_update(int(plane_quantity[0]) - quantity, quantity)
             else:
                 added_planes.hide()
         for event in events:
