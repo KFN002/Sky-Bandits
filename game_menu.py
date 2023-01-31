@@ -92,7 +92,8 @@ def start(player_data):
     engine = sound.Sound(-1)
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_CLICK_MOUSE, 'data/music/button.wav')
     menu.set_sound(engine, recursive=True)
-    while True:
+    running = True
+    while running:
         draw_background(current_plane.get_value(), buy_button, pic_place, player_data[4], planes)
         events = pygame.event.get()
         for event in events:
@@ -103,8 +104,9 @@ def start(player_data):
             if event.type == pygame.MOUSEBUTTONDOWN and info_btn._mouseover and event.button == 1:
                 redirect(current_plane.get_value())
             if event.type == pygame.QUIT:
-                exit()
+                running = False
         if menu.is_enabled():
             menu.update(events)
             menu.draw(surface)
         pygame.display.flip()
+    exit()

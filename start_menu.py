@@ -54,7 +54,8 @@ def start_menu():
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_KEY_ADDITION, 'data/music/button.wav')
     engine.set_sound(pygame_menu.sound.SOUND_TYPE_KEY_DELETION, 'data/music/button.wav')
     menu.set_sound(engine, recursive=True)
-    while True:
+    running = True
+    while running:
         events = pygame.event.get()
         if play_btn.is_selected():
             start_game(menu)
@@ -69,11 +70,13 @@ def start_menu():
                 added_planes.hide()
         for event in events:
             if event.type == pygame.QUIT:
-                exit()
+                running = False
         if menu.is_enabled():
             menu.update(events)
             menu.draw(surface)
         pygame.display.flip()
+    exit()
 
 
-start_menu()
+if __name__ == '__main__':
+    start_menu()
