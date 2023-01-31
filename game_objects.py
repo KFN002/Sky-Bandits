@@ -2,6 +2,7 @@ import pygame
 from pygame import mixer
 import data_master
 from random import choice
+import threading
 
 
 class BasicSprite(pygame.sprite.Sprite):
@@ -58,9 +59,9 @@ class Player(BasicSprite):
         else:
             self.rect.y -= self.speed
 
-    def move_down(self):
-        if self.rect.y >= 600 - self.rect.height:
-            self.rect.y = 600 - self.rect.height
+    def move_down(self, height):
+        if self.rect.y >= height - self.rect.height:
+            self.rect.y = height - self.rect.height
         else:
             self.rect.y += self.speed
 
@@ -70,9 +71,9 @@ class Player(BasicSprite):
         else:
             self.rect.x -= self.speed
 
-    def move_right(self):
-        if self.rect.x >= 1000 - self.rect.width:
-            self.rect.x = 1000 - self.rect.width
+    def move_right(self, width):
+        if self.rect.x >= width - self.rect.width:
+            self.rect.x = width - self.rect.width
         else:
             self.rect.x += self.speed
 
@@ -86,7 +87,10 @@ class Player(BasicSprite):
         if self.down and not self.exploding:
             group.remove(self)
             mixer.stop()
-            data_master.change_score_money(player_data, int(int(plane_data[7]) * score))
+            add_points = threading.Thread(target=data_master.change_score_money(player_data, int(int(plane_data[7])
+                                                                                                 * score)))
+            add_points.start()
+            data_master.show_info(player_data)
 
     def shoot(self, group):
         if self.bullets > 0:
@@ -212,7 +216,7 @@ class AARocket(BasicSprite):
                                     pygame.image.load('data/booms/boom3.png'),
                                     pygame.image.load('data/booms/boom4.png'),
                                     pygame.image.load('data/booms/boom5.png'),
-                                    pygame.image.load('data/booms/boom6.png')], 5)
+                                    pygame.image.load('data/booms/boom6.png')], 10)
         self.spo_sound = spo_sound
         self.rect.x = x
         self.rect.y = height
@@ -233,14 +237,14 @@ class AARocket(BasicSprite):
 
 
 class Enemy(BasicSprite):
-    def __init__(self, speed, enemy_pos):
-        BasicSprite.__init__(self, [pygame.image.load(choice(['data/planes/mig-23-1.png', 'data/planes/mig-23-2.png'])),
+    def __init__(self, enemy_pos):
+        BasicSprite.__init__(self, [pygame.image.load('data/planes/mig-23-1.png'),
                                     pygame.image.load('data/booms/boom1.png'),
                                     pygame.image.load('data/booms/boom2.png'),
                                     pygame.image.load('data/booms/boom3.png'),
                                     pygame.image.load('data/booms/boom4.png'),
                                     pygame.image.load('data/booms/boom5.png'),
-                                    pygame.image.load('data/booms/boom6.png')], speed * 0.5)
+                                    pygame.image.load('data/booms/boom6.png')], 2)
         self.rect.x = enemy_pos[0]
         self.rect.y = enemy_pos[1]
         self.sound = mixer.Sound('data/music/explosion.wav')

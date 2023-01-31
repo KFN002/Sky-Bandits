@@ -40,11 +40,11 @@ def start_menu():
     menu = pygame_menu.Menu('Sky Bandits', width, height, theme=my_theme)
     menu.add.image('data/logos/game_dev_logo.jpg', load_from_file=True,
                    align=pygame_menu.locals.ALIGN_RIGHT)
-    menu.add.label('Login or Sign up', font_size=20)
+    menu.add.label('Login or Sign up', font_size=40)
     menu.add.text_input('Name:', font_size=20)
     menu.add.text_input('Password:', font_size=20)
-    play_btn = menu.add.button('Play', start_game(menu), font_size=40)
-    menu.add.button('Quit', pygame_menu.events.EXIT, font_size=30)
+    play_btn = menu.add.button('Play', start_game(menu), font_size=42)
+    menu.add.button('Quit', pygame_menu.events.EXIT, font_size=25)
     menu.center_content()
     menu.add.label('Game by KFN001', align=pygame_menu.locals.ALIGN_LEFT,
                    font_color=pygame.Color('grey'), font_size=8)

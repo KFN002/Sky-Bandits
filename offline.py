@@ -9,7 +9,7 @@ def test_connection(host='http://google.com'):
         return True
     except:
         pygame.init()
-        size = width, height = 1000, 600
+        size = width, height = 1200, 600
         screen = pygame.display.set_mode(size)
         screen.fill('black')
         pygame.display.set_caption('OFFLINE ERROR')
