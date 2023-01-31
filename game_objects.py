@@ -90,7 +90,7 @@ class Player(BasicSprite):   # спрайт игрока: большинство
             add_points = threading.Thread(target=data_master.change_score_money(player_data, int(int(plane_data[7])
                                                                                                  * score)))
             add_points.start()
-            data_master.show_info(player_data)
+            data_master.show_info(data_master.check_player(player_data[0], player_data[1]))
 
     def shoot(self, group):
         if self.bullets > 0:
