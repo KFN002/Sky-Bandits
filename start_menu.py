@@ -22,7 +22,7 @@ def start_game(menu):  # проверка введенных данных, за�
         menu.reset_value()
 
 
-def start_menu():  # стартовое меню
+def start_menu():  # стартовое меню, логин и тд
     pygame.init()
     pygame.display.set_caption('Sky Bandits')
     mixer.music.load('data/music/theme.mp3')
