@@ -3,18 +3,17 @@ import pygame
 import random
 
 
-def play(plane_data, player_data):   # уровень вомбежка
+def play(plane_data, player_data):  # уровень вомбежка
     pygame.init()
     k_spawn = 0
     k_spawn_aa = 0
     k_spawn_decs = 0
     score = 0
     size = width, height = 1200, 600
-    screen = pygame.display.set_mode(size)
-    background = random.choice(['data/backgrounds/jungles.png',
-                                'data/backgrounds/forest.png',
-                                'data/backgrounds/mountains.png'])  # выбор карты
-    background = pygame.image.load(background).convert()
+    screen = pygame.display.set_mode(size)  # выбор карты
+    background = pygame.image.load(random.choice(['data/backgrounds/jungles.png',
+                                                  'data/backgrounds/forest.png',
+                                                  'data/backgrounds/mountains.png'])).convert()
     font = pygame.font.Font('data/fonts/font.ttf', 30)
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
@@ -38,7 +37,7 @@ def play(plane_data, player_data):   # уровень вомбежка
         if key_pressed[pygame.K_d] or key_pressed[pygame.K_RIGHT]:
             player.move_right(width)
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:   # кидание бомбы
+            if event.type == pygame.MOUSEBUTTONDOWN:  # кидание бомбы
                 if pygame.mouse.get_pressed()[0]:
                     player.drop_bomb(bombs)
             if event.type == pygame.QUIT:
@@ -53,7 +52,7 @@ def play(plane_data, player_data):   # уровень вомбежка
             aa = AARocket(plane_data[12], player.rect.x + 25, height)
             enemy_aa.add(aa)
             aa.chase()
-        for rocket in enemy_aa:   # далее идет работа со спрайтами:
+        for rocket in enemy_aa:  # далее идет работа со спрайтами:
             rocket.move(-1)
             rocket.update_animation(enemy_aa)
             if not rocket.check_collision(players) and not rocket.destroyed:

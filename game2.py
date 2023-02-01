@@ -10,10 +10,9 @@ def play(plane_data, player_data):  # аналогично 1 уровню, но 
     score = 0
     size = width, height = 1200, 600
     screen = pygame.display.set_mode(size)
-    background = random.choice(['data/backgrounds/jungles.png',
-                                'data/backgrounds/forest.png',
-                                'data/backgrounds/mountains.png'])
-    background = pygame.image.load(background).convert()
+    background = pygame.image.load(random.choice(['data/backgrounds/jungles.png',
+                                                  'data/backgrounds/forest.png',
+                                                  'data/backgrounds/mountains.png'])).convert()
     font = pygame.font.Font('data/fonts/font.ttf', 30)
     enemies = pygame.sprite.Group()
     players = pygame.sprite.Group()
