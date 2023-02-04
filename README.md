@@ -2,5 +2,5 @@
 Game made using Pygame
 
 Copy all files.
-Unzip data.zip
+Unzip data.zip.
 Use
