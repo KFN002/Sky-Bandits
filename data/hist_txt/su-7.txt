@@ -1,0 +1,11 @@
+﻿The Sukhoi Su-7 (NATO designation name: Fitter-A) is a swept wing, 
+supersonic fighter aircraft developed by the Soviet Union in 1955. 
+Originally, it was designed as a tactical, low-level dogfighter, 
+but was not successful in this role. On the other hand, 
+the soon-introduced Su-7B series became the main Soviet fighter-bomber 
+and ground-attack aircraft of the 1960s. 
+The Su-7 was rugged in its simplicity, 
+but its Lyulka AL-7 engine had such high fuel consumption 
+that it seriously limited the aircraft's payload, 
+as even short-range missions required that at least two hardpoints 
+be used to carry drop tanks rather than ordnance.
