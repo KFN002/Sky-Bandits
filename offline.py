@@ -7,7 +7,7 @@ def test_connection(host='http://google.com'):  # проверка подклю�
     try:
         urllib.request.urlopen(host)
         return True
-    except:
+    except Exception:
         pygame.init()
         size = width, height = 1200, 600
         screen = pygame.display.set_mode(size)
